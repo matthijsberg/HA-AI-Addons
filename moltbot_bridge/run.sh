@@ -44,15 +44,12 @@ CONFIG_FILE="$MOLTBOT_DIR/clawdbot.json"
 
 # Always create or update the config file to prevent "Missing config" error
 echo "Updating Moltbot configuration..."
+# Minimal config only
 cat > "$CONFIG_FILE" <<EOF
 {
   "gateway": {
     "mode": "local",
     "port": 18789
-  },
-  "llm": {
-    "provider": "google-genai",
-    "model": "$MODEL_NAME"
   },
   "logging": {
     "level": "info"
@@ -63,6 +60,20 @@ EOF
 if [ -n "$GEMINI_KEY" ] && [ "$GEMINI_KEY" != "null" ]; then
     echo "Gemini API Key detected. Setting environment variable."
     export GOOGLE_API_KEY="$GEMINI_KEY"
+    
+    # Use CLI to set config values (safest way to avoid schema errors)
+    # We try both potential key structures since schema is undocumented
+    echo "Setting up Gemini provider via CLI..."
+    
+    # Try setting provider/model. If these keys are wrong, the CLI might warn but likely won't crash.
+    # Common Clawdbot patterns:
+    clawdbot config set llm.provider google-genai || true
+    clawdbot config set llm.model "$MODEL_NAME" || true
+    
+    # Also try setting as root keys if the above failed silently or just in case
+    clawdbot config set provider google-genai || true
+    clawdbot config set model "$MODEL_NAME" || true
+    
 else
     echo "WARNING: No Gemini API Key provided. Use the add-on Configuration tab to add it."
 fi

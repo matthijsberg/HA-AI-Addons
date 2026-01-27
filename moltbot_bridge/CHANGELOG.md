@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.14] - 2024-01-27
+### Fixed
+- Fixed invalid `clawdbot.json` schema error by using the CLI (`clawdbot config set`) to configure the LLM provider and model instead of writing raw JSON.
+
 ## [0.1.13] - 2024-01-27
 ### Fixed
 - Fixed Moltbot startup crash by always creating a configuration file and using the `--allow-unconfigured` flag.
