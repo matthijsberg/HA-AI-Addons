@@ -4,15 +4,15 @@ This bridge connects Home Assistant with various messaging platforms and ecosyst
 
 ## Home Assistant Setup
 
-### Long-lived Access Token
-1. Click on your profile name in the bottom left of the Home Assistant sidebar.
-2. Scroll to the bottom and find **Long-lived Access Tokens**.
-3. Create a new token and name it `Moltbot Bridge`.
-4. Copy this token into the `ha_token` field in the add-on configuration.
+Good news! The Moltbot Bridge is now **fully automatic**. 
 
-### Discovery URL
-If the add-on is running in the same instance, use:
-`http://supervisor/core/api`
+The add-on uses the internal Home Assistant API permission to connect. You do **not** need to create a Long-lived Access Token or configure the URL unless you are connecting to a *remote* Home Assistant instance.
+
+### Manual Override (Optional)
+If you need to connect to a different Home Assistant instance:
+1. Set the `ha_url` in the configuration (e.g., `http://192.168.1.10:8123/api`).
+2. Provide a Long-lived Access Token in the `ha_token` field.
+
 
 ## Messaging Platforms
 
