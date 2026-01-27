@@ -5,7 +5,8 @@ CONFIG_PATH=/data/options.json
 
 # Extract config values using jq
 export LOG_LEVEL=$(jq --raw-output '.log_level // "info"' $CONFIG_PATH)
-export HA_URL=$(jq --raw-output '.ha_url // "http://supervisor/core/api"' $CONFIG_PATH)
+# Use internal WebSocket URL by default
+export HA_URL=$(jq --raw-output '.ha_url // "ws://supervisor/core/websocket"' $CONFIG_PATH)
 export HA_TOKEN=$(jq --raw-output '.ha_token // empty' $CONFIG_PATH)
 
 # If HA_TOKEN is not provided in config, try to use the supervisor token
