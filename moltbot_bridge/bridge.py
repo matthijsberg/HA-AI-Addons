@@ -204,11 +204,34 @@ async def main():
             user_message = data.get('message', '')
             logger.info(f"Chat received: {user_message}")
             
-            # TODO: Integrate with actual Moltbot/LLM backend
-            # For now, simple echo/stub response
-            bot_response = f"I received: {user_message}"
+            # Forward message to Moltbot Gateway
+            # Assuming Moltbot exposes a chat/completion endpoint. 
+            # Based on typical Gateway architecture, it might be /api/chat or similar.
+            # If plain gateway, we might need a specific client.
+            # For now, we try to POST to the gateway port.
             
-            return web.json_response({'response': bot_response})
+            moltbot_url = "http://localhost:18789/api/chat" # Best guess standard endpoint
+            async with aiohttp.ClientSession() as session:
+                try:
+                    # Note: We might need to adjust payload format based on Moltbot's actual API
+                    payload = {
+                        "messages": [{"role": "user", "content": user_message}],
+                        "stream": False 
+                    }
+                    async with session.post(moltbot_url, json=payload) as resp:
+                        if resp.status == 200:
+                            data = await resp.json()
+                            # Try to extract content. Adjust key based on actual response
+                            bot_text = data.get("content") or data.get("message") or str(data)
+                            return web.json_response({'response': bot_text})
+                        else:
+                            err_text = await resp.text()
+                            logger.error(f"Moltbot API error {resp.status}: {err_text}")
+                            return web.json_response({'response': f"Error from Moltbot: {resp.status}"})
+                except Exception as ex:
+                    logger.error(f"Failed to contact Moltbot: {ex}")
+                    return web.json_response({'response': "Moltbot is not reachable yet (still starting?)."})
+                    
         except Exception as e:
             logger.error(f"Chat error: {e}")
             return web.json_response({'error': str(e)}, status=500)

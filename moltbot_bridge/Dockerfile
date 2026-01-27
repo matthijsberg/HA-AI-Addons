@@ -1,18 +1,19 @@
-FROM python:3.11-slim
+FROM python:3.11-bookworm
 
 ENV LANG C.UTF-8
 
-# Install build dependencies if necessary
+# Install build dependencies and Node.js
 RUN apt-get update && apt-get install -y --no-install-recommends \
     jq \
     curl \
+    git \
+    nodejs \
+    npm \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
 # Install Python dependencies
-# We list them here for simplicity, but a requirements.txt is also fine.
-# Added pydantic, aiohttp, websockets, google-auth, twilio
 RUN pip install --no-cache-dir \
     aiohttp \
     websockets \
