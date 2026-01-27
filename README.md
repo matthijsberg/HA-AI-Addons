@@ -13,9 +13,10 @@ A Home Assistant Add-on that serves as a central intelligence bridge, inspired b
 
 ## Installation
 
-1.  Copy the `moltbot_bridge` folder to your Home Assistant `addons/` directory (local add-on).
-2.  Refresh the Add-on Store in Home Assistant.
-3.  Install "Moltbot-HA Bridge Add-on".
+1.  In Home Assistant, navigate to **Settings** > **Add-ons** > **Add-on Store**.
+2.  Click the three-dot menu in the upper right and select **Repositories**.
+3.  Add the following URL: `https://github.com/matthijsberg/moltbot_bridge`
+4.  Once added, search for **Moltbot-HA Bridge Add-on** in the store and install it.
 
 ## Configuration
 

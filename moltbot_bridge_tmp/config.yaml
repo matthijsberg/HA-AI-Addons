@@ -1,0 +1,34 @@
+name: "Moltbot-HA Bridge Add-on"
+version: "0.1.0"
+slug: "moltbot_bridge"
+description: "Moltbot-based Add-on Bridge for Home Assistant"
+url: "https://github.com/moltbot/moltbot"
+startup: application
+boot: auto
+arch:
+  - aarch64
+  - amd64
+  - armv7
+map:
+  - config:rw
+options:
+  log_level: "info"
+  ha_url: "http://supervisor/core/api"
+  ha_token: ""
+  bluebubbles_url: ""
+  bluebubbles_token: ""
+  whatsapp_provider: "twilio"
+  whatsapp_sid: ""
+  whatsapp_token: ""
+  whatsapp_from: ""
+schema:
+  log_level: list(debug|info|warning|error)
+  ha_url: str
+  ha_token: str?
+  bluebubbles_url: str?
+  bluebubbles_token: str?
+  whatsapp_provider: list(twilio|matrix)
+  whatsapp_sid: str?
+  whatsapp_token: str?
+  whatsapp_from: str?
+image: "python:3.11-slim"
