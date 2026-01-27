@@ -10,8 +10,8 @@ export LOG_LEVEL=$(jq --raw-output '.log_level // "info"' $CONFIG_PATH)
 if [ -z "$HA_TOKEN" ]; then
     echo "Auto-configuring Home Assistant Connection..."
     export HA_TOKEN=$SUPERVISOR_TOKEN
-    # Force direct connection to HA Core container (bypassing supervisor proxy)
-    export HA_URL="ws://homeassistant:8123/api/websocket"
+    # Force internal WebSocket URL when using Supervisor Token
+    export HA_URL="ws://supervisor/core/websocket"
 else
     # Manual mode: Use configured URL (or default if null)
     export HA_URL=$(jq --raw-output '.ha_url // "ws://supervisor/core/websocket"' $CONFIG_PATH)
