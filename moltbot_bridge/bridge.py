@@ -7,6 +7,7 @@ import sys
 from typing import Optional, List, Dict, Any
 from pydantic import BaseModel, Field, ValidationError
 import aiohttp
+from aiohttp import web
 import websockets
 
 # --- Configuration & Validation ---
@@ -195,7 +196,7 @@ async def main():
     ha_client = HomeAssistantClient(config.ha_url, config.ha_token)
     
     # 3. Setup Web Server for Chat
-    app = aiohttp.web.Application()
+    app = web.Application()
     
     async def handle_chat(request):
         try:
@@ -207,10 +208,10 @@ async def main():
             # For now, simple echo/stub response
             bot_response = f"I received: {user_message}"
             
-            return aiohttp.web.json_response({'response': bot_response})
+            return web.json_response({'response': bot_response})
         except Exception as e:
             logger.error(f"Chat error: {e}")
-            return aiohttp.web.json_response({'error': str(e)}, status=500)
+            return web.json_response({'error': str(e)}, status=500)
 
     app.router.add_post('/api/chat', handle_chat)
     
@@ -222,9 +223,9 @@ async def main():
         logger.warning(f"Web directory not found at {web_dir}")
 
     # Create web runner
-    runner = aiohttp.web.AppRunner(app)
+    runner = web.AppRunner(app)
     await runner.setup()
-    site = aiohttp.web.TCPSite(runner, '0.0.0.0', 8099)
+    site = web.TCPSite(runner, '0.0.0.0', 8099)
     await site.start()
     logger.info("Web interface started on port 8099")
 
