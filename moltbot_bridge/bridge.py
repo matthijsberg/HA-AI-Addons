@@ -53,7 +53,8 @@ class HomeAssistantClient:
     async def connect(self):
         logger.info(f"Connecting to Home Assistant at {self.ws_url}")
         try:
-            self.connection = await websockets.connect(self.ws_url)
+            extra_headers = {"Authorization": f"Bearer {self.token}"}
+            self.connection = await websockets.connect(self.ws_url, extra_headers=extra_headers)
             auth_msg = await self.connection.recv()
             auth_data = json.loads(auth_msg)
             
