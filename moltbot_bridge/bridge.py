@@ -48,6 +48,7 @@ class HomeAssistantClient:
         self.connection = None
         self._message_id = 1
         self._futures: Dict[int, asyncio.Future] = {}
+        self._connected = False
 
     async def connect(self):
         logger.info(f"Connecting to Home Assistant at {self.ws_url}")
@@ -67,11 +68,15 @@ class HomeAssistantClient:
                 
                 if auth_resp.get("type") == "auth_ok":
                     logger.info("Authenticated with Home Assistant")
+                    self._connected = True
                     # Start listening loop
                     asyncio.create_task(self.listen())
                 else:
                     logger.error(f"Authentication failed: {auth_resp}")
-                    raise ConnectionError("Auth failed")
+                    raise ConnectionError(f"Auth failed: {auth_resp}")
+            else:
+                logger.warning(f"Unexpected initial sequence: {auth_data}")
+
         except Exception as e:
             logger.error(f"Failed to connect to HA: {e}")
             raise
@@ -79,19 +84,30 @@ class HomeAssistantClient:
     async def listen(self):
         try:
             async for message in self.connection:
-                data = json.loads(message)
-                # logger.debug(f"Received: {data}")
-                
-                # Handle responses to our requests
-                if "id" in data and data["id"] in self._futures:
-                    self._futures[data["id"]].set_result(data)
-                    del self._futures[data["id"]]
+                try:
+                    data = json.loads(message)
+                    # logger.debug(f"Received: {data}")
                     
-                # Event handling can go here
+                    # Handle responses to our requests
+                    if "id" in data and data["id"] in self._futures:
+                        self._futures[data["id"]].set_result(data)
+                        del self._futures[data["id"]]
+                        
+                    # Event handling can go here
+                except json.JSONDecodeError:
+                    logger.warning(f"Received invalid JSON: {message}")
         except websockets.ConnectionClosed:
             logger.warning("Connection closed")
+            self._connected = False
+        except Exception as e:
+            logger.error(f"Listen loop error: {e}")
+            self._connected = False
             
     async def call_service(self, domain: str, service: str, service_data: Dict[str, Any] = None):
+        if not self._connected:
+             logger.warning("Cannot call service, not connected to HA")
+             return None
+
         msg_id, future = self._create_future()
         msg = {
             "id": msg_id,
@@ -104,6 +120,10 @@ class HomeAssistantClient:
         return await future
 
     async def get_states(self):
+        if not self._connected:
+             logger.warning("Cannot get states, not connected to HA")
+             return None
+
         msg_id, future = self._create_future()
         msg = {
             "id": msg_id,
@@ -117,6 +137,10 @@ class HomeAssistantClient:
         future = asyncio.Future()
         self._futures[self._message_id] = future
         return self._message_id, future
+        
+    async def close(self):
+        if self.connection:
+            await self.connection.close()
 
 # --- Integration Stubs ---
 class GoogleIntegration:
@@ -153,11 +177,13 @@ async def main():
             "whatsapp_token": os.getenv("WHATSAPP_TOKEN"),
             "whatsapp_from": os.getenv("WHATSAPP_FROM"),
         }
-        # Filter None values to let Pydantic defaults work if needed, 
-        # though environment variables return None if missing so we keep them.
+        # Filter purely None/missing values so defaults work if not in env
+        config_data = {k: v for k, v in config_data.items() if v is not None}
+        
         config = AddonConfig(**config_data)
     except ValidationError as e:
         print(f"Configuration Error:\n{e}")
+        # In Add-ons, better to exit so supervisor restarts or logs error clearly
         sys.exit(1)
 
     setup_logging(config.log_level)
@@ -166,14 +192,7 @@ async def main():
     # 2. Initialize Clients
     ha_client = HomeAssistantClient(config.ha_url, config.ha_token)
     
-    # 3. Connect (with retry logic in real app, simple here)
-    try:
-        await ha_client.connect()
-    except Exception as e:
-        logger.error("Could not connect to Home Assistant on startup. Exiting.")
-        return
-
-    # 4. Main Loop
+    # 4. Main Loop & Signal Handling
     stop_event = asyncio.Event()
     
     def signal_handler():
@@ -184,9 +203,37 @@ async def main():
     loop.add_signal_handler(signal.SIGTERM, signal_handler)
     loop.add_signal_handler(signal.SIGINT, signal_handler)
 
-    logger.info("Bridge is running. Waiting for events...")
-    await stop_event.wait()
+    logger.info("Bridge is starting loop. Connecting to HA...")
+    
+    while not stop_event.is_set():
+        try:
+            if not ha_client._connected:
+                try:
+                    await ha_client.connect()
+                except (ConnectionError, OSError) as e:
+                    logger.error(f"Connection failed: {e}. Retrying in 10s...")
+                    try:
+                        await asyncio.wait_for(stop_event.wait(), timeout=10)
+                    except asyncio.TimeoutError:
+                        continue 
+                    
+            # If connected, just wait (the listen task runs in background)
+            # We check periodically if we are still connected or if stop signal came
+            try:
+                await asyncio.wait_for(stop_event.wait(), timeout=5)
+            except asyncio.TimeoutError:
+                pass # Just a loop cycle to check status
+                
+        except Exception as e:
+            logger.error(f"Unexpected error in main loop: {e}", exc_info=True)
+            await asyncio.sleep(5)
+
     logger.info("Shutting down...")
+    await ha_client.close()
+    logger.info("Goodbye.")
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        pass
