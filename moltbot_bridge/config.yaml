@@ -1,5 +1,5 @@
 name: "Moltbot-HA Bridge Add-on"
-version: "0.1.3"
+version: "0.1.4"
 slug: "moltbot_bridge"
 description: "Moltbot-based Add-on Bridge for Home Assistant"
 url: "https://github.com/moltbot/moltbot"
@@ -14,7 +14,7 @@ map:
   - config:rw
 options:
   log_level: "info"
-  ha_url: "http://supervisor/core/api"
+  ha_url: "ws://supervisor/core/websocket"
   ha_token: ""
   bluebubbles_url: ""
   bluebubbles_token: ""

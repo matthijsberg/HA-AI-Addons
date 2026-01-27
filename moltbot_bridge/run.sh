@@ -6,13 +6,15 @@ CONFIG_PATH=/data/options.json
 # Extract config values using jq
 export LOG_LEVEL=$(jq --raw-output '.log_level // "info"' $CONFIG_PATH)
 # Use internal WebSocket URL by default
-export HA_URL=$(jq --raw-output '.ha_url // "ws://supervisor/core/websocket"' $CONFIG_PATH)
-export HA_TOKEN=$(jq --raw-output '.ha_token // empty' $CONFIG_PATH)
-
-# If HA_TOKEN is not provided in config, try to use the supervisor token
+# If HA_TOKEN is not provided in config, use Supervisor Token and INTERNAL URL
 if [ -z "$HA_TOKEN" ]; then
-    echo "Using Supervisor Token"
+    echo "Auto-configuring Home Assistant Connection..."
     export HA_TOKEN=$SUPERVISOR_TOKEN
+    # Force internal WebSocket URL when using Supervisor Token
+    export HA_URL="ws://supervisor/core/websocket"
+else
+    # Manual mode: Use configured URL (or default if null)
+    export HA_URL=$(jq --raw-output '.ha_url // "ws://supervisor/core/websocket"' $CONFIG_PATH)
 fi
 
 export BLUEBUBBLES_URL=$(jq --raw-output '.bluebubbles_url // empty' $CONFIG_PATH)
