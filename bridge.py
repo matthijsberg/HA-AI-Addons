@@ -33,7 +33,7 @@ def setup_logging(level_str: str):
         stream=sys.stdout
     )
 
-logger = logging.getLogger("MoltbotBridge")
+logger = logging.getLogger("MoltbotAddon")
 
 # --- Home Assistant Client ---
 class HomeAssistantClient:
@@ -161,7 +161,7 @@ async def main():
         sys.exit(1)
 
     setup_logging(config.log_level)
-    logger.info("Starting Moltbot Bridge Agent...")
+    logger.info("Starting Moltbot-HA Bridge Add-on...")
 
     # 2. Initialize Clients
     ha_client = HomeAssistantClient(config.ha_url, config.ha_token)

@@ -22,6 +22,6 @@ export WHATSAPP_SID=$(jq --raw-output '.whatsapp_sid // empty' $CONFIG_PATH)
 export WHATSAPP_TOKEN=$(jq --raw-output '.whatsapp_token // empty' $CONFIG_PATH)
 export WHATSAPP_FROM=$(jq --raw-output '.whatsapp_from // empty' $CONFIG_PATH)
 
-echo "Starting Moltbot Bridge with Log Level: $LOG_LEVEL"
+echo "Starting Moltbot-HA Bridge Add-on with Log Level: $LOG_LEVEL"
 
 exec python3 bridge.py

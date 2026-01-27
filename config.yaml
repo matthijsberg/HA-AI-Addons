@@ -1,7 +1,7 @@
-name: "Moltbot Bridge"
+name: "Moltbot-HA Bridge Add-on"
 version: "0.1.0"
 slug: "moltbot_bridge"
-description: "Moltbot-based Agent Bridge for Home Assistant"
+description: "Moltbot-based Add-on Bridge for Home Assistant"
 url: "https://github.com/moltbot/moltbot"
 startup: application
 boot: auto

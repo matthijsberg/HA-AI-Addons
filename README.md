@@ -1,4 +1,4 @@
-# Moltbot-HA Bridge Agent
+# Moltbot-HA Bridge Add-on
 
 A Home Assistant Add-on that serves as a central intelligence bridge, inspired by the Moltbot framework. It connects Home Assistant, Google Ecosystems, and Messaging platforms (BlueBubbles for iMessage, WhatsApp) into a unified control agent.
 
@@ -15,7 +15,7 @@ A Home Assistant Add-on that serves as a central intelligence bridge, inspired b
 
 1.  Copy the `moltbot_bridge` folder to your Home Assistant `addons/` directory (local add-on).
 2.  Refresh the Add-on Store in Home Assistant.
-3.  Install "Moltbot Bridge".
+3.  Install "Moltbot-HA Bridge Add-on".
 
 ## Configuration
 
