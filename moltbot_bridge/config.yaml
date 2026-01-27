@@ -1,5 +1,5 @@
 name: "Moltbot-HA Bridge Add-on"
-version: "0.1.10"
+version: "0.1.11"
 slug: "moltbot_bridge"
 description: "Moltbot-based Add-on Bridge for Home Assistant"
 url: "https://github.com/moltbot/moltbot"
@@ -20,6 +20,8 @@ options:
   log_level: "info"
   ha_url: "ws://supervisor/core/websocket"
   ha_token: ""
+  gemini_api_key: ""
+  model_name: "gemini-3.0-flash"
   bluebubbles_url: ""
   bluebubbles_token: ""
   whatsapp_provider: "twilio"
@@ -27,12 +29,14 @@ options:
   whatsapp_token: ""
   whatsapp_from: ""
 schema:
-  log_level: list(debug|info|warning|error)
-  ha_url: str
-  ha_token: str
-  bluebubbles_url: str
-  bluebubbles_token: str
-  whatsapp_provider: list(twilio|matrix)
-  whatsapp_sid: str
-  whatsapp_token: str
-  whatsapp_from: str
+  log_level: "list(debug|info|warning|error)"
+  ha_url: "str"
+  ha_token: "password?"
+  gemini_api_key: "password?"
+  model_name: "str"
+  bluebubbles_url: "str?"
+  bluebubbles_token: "password?"
+  whatsapp_provider: "list(twilio|matrix)?"
+  whatsapp_sid: "str?"
+  whatsapp_token: "password?"
+  whatsapp_from: "str?"
