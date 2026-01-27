@@ -42,11 +42,9 @@ MOLTBOT_DIR="/root/.clawdbot"
 mkdir -p "$MOLTBOT_DIR"
 CONFIG_FILE="$MOLTBOT_DIR/clawdbot.json"
 
-if [ -n "$GEMINI_KEY" ] && [ "$GEMINI_KEY" != "null" ]; then
-    echo "Configuring Gemini..."
-    export GOOGLE_API_KEY="$GEMINI_KEY"
-    
-    cat > "$CONFIG_FILE" <<EOF
+# Always create or update the config file to prevent "Missing config" error
+echo "Updating Moltbot configuration..."
+cat > "$CONFIG_FILE" <<EOF
 {
   "gateway": {
     "mode": "local",
@@ -61,13 +59,18 @@ if [ -n "$GEMINI_KEY" ] && [ "$GEMINI_KEY" != "null" ]; then
   }
 }
 EOF
+
+if [ -n "$GEMINI_KEY" ] && [ "$GEMINI_KEY" != "null" ]; then
+    echo "Gemini API Key detected. Setting environment variable."
+    export GOOGLE_API_KEY="$GEMINI_KEY"
 else
-    echo "WARNING: No Gemini API Key provided. Moltbot might not work correctly."
+    echo "WARNING: No Gemini API Key provided. Use the add-on Configuration tab to add it."
 fi
 
 # 4. Start Moltbot in background
 echo "Starting Moltbot Gateway..."
-clawdbot gateway --port 18789 &
+# Use --allow-unconfigured to ensure it starts even if some keys are missing initially
+clawdbot gateway --port 18789 --allow-unconfigured &
 MOLTBOT_PID=$!
 
 # Wait for Moltbot to initialize
