@@ -1,9 +1,13 @@
 name: "Moltbot-HA Bridge Add-on"
-version: "0.1.7"
+version: "0.1.8"
 slug: "moltbot_bridge"
 description: "Moltbot-based Add-on Bridge for Home Assistant"
 url: "https://github.com/moltbot/moltbot"
 homeassistant_api: true
+ingress: true
+ingress_port: 8099
+panel_icon: mdi:robot
+panel_title: Moltbot
 startup: application
 boot: auto
 arch:

@@ -194,6 +194,40 @@ async def main():
     # 2. Initialize Clients
     ha_client = HomeAssistantClient(config.ha_url, config.ha_token)
     
+    # 3. Setup Web Server for Chat
+    app = aiohttp.web.Application()
+    
+    async def handle_chat(request):
+        try:
+            data = await request.json()
+            user_message = data.get('message', '')
+            logger.info(f"Chat received: {user_message}")
+            
+            # TODO: Integrate with actual Moltbot/LLM backend
+            # For now, simple echo/stub response
+            bot_response = f"I received: {user_message}"
+            
+            return aiohttp.web.json_response({'response': bot_response})
+        except Exception as e:
+            logger.error(f"Chat error: {e}")
+            return aiohttp.web.json_response({'error': str(e)}, status=500)
+
+    app.router.add_post('/api/chat', handle_chat)
+    
+    # Serve static files - ensure directory exists
+    web_dir = os.path.join(os.path.dirname(__file__), 'web')
+    if os.path.exists(web_dir):
+        app.router.add_static('/', web_dir, show_index=True)
+    else:
+        logger.warning(f"Web directory not found at {web_dir}")
+
+    # Create web runner
+    runner = aiohttp.web.AppRunner(app)
+    await runner.setup()
+    site = aiohttp.web.TCPSite(runner, '0.0.0.0', 8099)
+    await site.start()
+    logger.info("Web interface started on port 8099")
+
     # 4. Main Loop & Signal Handling
     stop_event = asyncio.Event()
     
@@ -231,6 +265,8 @@ async def main():
             await asyncio.sleep(5)
 
     logger.info("Shutting down...")
+    await site.stop()
+    await runner.cleanup()
     await ha_client.close()
     logger.info("Goodbye.")
 

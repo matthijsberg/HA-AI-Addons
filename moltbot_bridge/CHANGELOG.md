@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.8] - 2024-01-27
+### Added
+- Web Chat Interface! Includes a "Moltbot" sidebar item and a web UI accessible via Ingress.
+- Exposed internal web server on port 8099.
+
 ## [0.1.7] - 2024-01-27
 ### Fixed
 - Reverted to official `ws://supervisor/core/websocket` endpoint, now that Authorization headers are correctly implemented.
