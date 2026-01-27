@@ -24,11 +24,11 @@ options:
 schema:
   log_level: list(debug|info|warning|error)
   ha_url: str
-  ha_token: str?
-  bluebubbles_url: str?
-  bluebubbles_token: str?
+  ha_token: str
+  bluebubbles_url: str
+  bluebubbles_token: str
   whatsapp_provider: list(twilio|matrix)
-  whatsapp_sid: str?
-  whatsapp_token: str?
-  whatsapp_from: str?
-image: "python:3.11-slim"
+  whatsapp_sid: str
+  whatsapp_token: str
+  whatsapp_from: str
+image: "moltbot/bridge-{arch}"
