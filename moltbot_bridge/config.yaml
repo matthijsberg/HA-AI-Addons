@@ -31,4 +31,3 @@ schema:
   whatsapp_sid: str
   whatsapp_token: str
   whatsapp_from: str
-image: "moltbot/bridge-{arch}"
