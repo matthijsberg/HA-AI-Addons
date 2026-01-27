@@ -215,12 +215,20 @@ async def main():
 
     app.router.add_post('/api/chat', handle_chat)
     
-    # Serve static files - ensure directory exists
-    web_dir = os.path.join(os.path.dirname(__file__), 'web')
-    if os.path.exists(web_dir):
-        app.router.add_static('/', web_dir, show_index=True)
-    else:
-        logger.warning(f"Web directory not found at {web_dir}")
+    # Serve index.html explicitly to ensure Ingress finds it at root
+    async def index(request):
+        web_dir = os.path.join(os.path.dirname(__file__), 'web')
+        index_file = os.path.join(web_dir, 'index.html')
+        if os.path.exists(index_file):
+            return web.FileResponse(index_file)
+        return web.Response(text="Web interface not found", status=404)
+
+    app.router.add_get('/', index)
+    app.router.add_get('/index.html', index)
+    
+    # Optional: Serve other static files if needed, avoiding root conflict
+    # web_dir = os.path.join(os.path.dirname(__file__), 'web')
+    # app.router.add_static('/static/', web_dir)
 
     # Create web runner
     runner = web.AppRunner(app)
