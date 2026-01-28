@@ -1,5 +1,5 @@
 name: "Ollama (Local LLM)"
-version: "0.2.204"
+version: "0.2.205"
 slug: "ollama"
 description: "Run Ollama locally for private, high-performance AI. Includes hardware-aware model recommendations."
 url: "https://github.com/matthijsberg/HA-AI-Addons"

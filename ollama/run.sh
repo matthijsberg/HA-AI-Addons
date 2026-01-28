@@ -153,15 +153,27 @@ fi
 echo "Ollama API is active!"
 
 # Pull the requested model if not present
+MODEL_READY=false
 if ./ollama list | grep -q "$MODEL"; then
     echo "Model '$MODEL' is cached and ready."
+    MODEL_READY=true
 else
     echo "Model '$MODEL' not found. Downloading (this may take several minutes)..."
-    ./ollama pull "$MODEL"
+    if ./ollama pull "$MODEL"; then
+        echo "Model '$MODEL' downloaded successfully."
+        MODEL_READY=true
+    else
+        echo "Error: Failed to download model '$MODEL'."
+    fi
 fi
 
 echo "----------------------------------------------------"
-echo " Ollama is running and model '$MODEL' is loaded.    "
+if [ "$MODEL_READY" = "true" ]; then
+    echo " Ollama is running and model '$MODEL' is loaded.    "
+else
+    echo " Ollama is running but model '$MODEL' FAILED to load."
+    echo " Please check the logs for download errors."
+fi
 echo " Internal URL: http://ollama:11434                  "
 echo "----------------------------------------------------"
 
