@@ -7,6 +7,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3 \
     python3-pip \
     python3-psutil \
+    intel-opencl-icd \
+    intel-level-zero-gpu \
+    level-zero \
+    intel-media-va-driver-non-free \
+    libmfx1 \
+    libvpl2 \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Ollama

@@ -1,5 +1,5 @@
 name: "Ollama (Local LLM)"
-version: "0.2.2"
+version: "0.2.3"
 slug: "ollama"
 description: "Run Ollama locally for private, high-performance AI. Includes hardware-aware model recommendations."
 url: "https://github.com/matthijsberg/HA-AI-Addons"
@@ -8,6 +8,12 @@ boot: auto
 arch:
   - aarch64
   - amd64
+privileged:
+  - SYS_ADMIN
+full_access: true
+devices:
+  - /dev/dri:/dev/dri
+  - /dev/accel:/dev/accel
 ports:
   11434/tcp: 11434
 map:

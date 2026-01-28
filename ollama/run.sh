@@ -25,6 +25,8 @@ fi
 # Configure Ollama environment
 export OLLAMA_HOST="0.0.0.0"
 export OLLAMA_MODELS="/share/ollama/models" # Persist models in /share
+export OLLAMA_INTEL_GPU="true"
+export ZES_ENABLE_SYSMAN=1
 
 mkdir -p "$OLLAMA_MODELS"
 
