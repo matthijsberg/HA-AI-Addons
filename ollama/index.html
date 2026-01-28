@@ -24,6 +24,7 @@
         Status: <span id="connection-status">Checking...</span> |
         Model: <select id="model-select"><option>Loading...</option></select>
         <button id="delete-btn" onclick="deleteModel()" style="background: #dc3545; padding: 5px 10px; margin-left: 10px;">Delete</button>
+        <button id="test-btn" onclick="testModel()" style="background: #28a745; padding: 5px 10px; margin-left: 10px;">Test</button>
         <span id="running-model" style="margin-left: 10px; color: #007bff; font-size: 0.9em;"></span>
     </div>
     <div id="chat-container"></div>
@@ -123,6 +124,39 @@
                 }
             } catch (error) {
                 alert(`Error: ${error.message}`);
+            }
+        }
+
+        async function testModel() {
+            if (!currentModel) return;
+            const btn = document.getElementById('test-btn');
+            const originalText = btn.textContent;
+            btn.textContent = "Testing...";
+            btn.disabled = true;
+
+            try {
+                const response = await fetch('api/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        model: currentModel,
+                        prompt: "Are you working?",
+                        stream: false
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    alert(`Success! Model responded: "${data.response}"`);
+                } else {
+                    const err = await response.text();
+                    alert(`Test Failed: ${response.status} ${response.statusText}\n${err}`);
+                }
+            } catch (error) {
+                alert(`Test Error: ${error.message}`);
+            } finally {
+                btn.textContent = originalText;
+                btn.disabled = false;
             }
         }
 
