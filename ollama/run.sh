@@ -22,14 +22,27 @@ else
     echo "Using Selected Model: $MODEL"
 fi
 
+# IPEX and Ollama Initialization
+echo "--- IPEX Initialization ---"
+# Source the IPEX environment (this sets up SYCL and oneAPI paths)
+# Note: we use . because source might not be available in some shells
+. ipex-llm-init --gpu --device "$DEVICE" || echo "IPEX-LLM init failed, continuing anyway..."
+
+echo "--- Ollama Initialization ---"
+# The IPEX image expects ollama to be initialized in a specific way
+mkdir -p /llm/ollama
+cd /llm/ollama
+if [ ! -f "./ollama" ]; then
+    echo "Initializing Ollama binary..."
+    init-ollama || echo "init-ollama failed"
+fi
+
 # Hardware Diagnostics
 echo "--- Hardware Diagnostics ---"
 echo "Checking /dev/dri:"
 ls -l /dev/dri 2>/dev/null || echo "No /dev/dri found"
 echo "Checking /dev/accel:"
 ls -l /dev/accel 2>/dev/null || echo "No /dev/accel found"
-echo "OpenCL Info (clinfo):"
-clinfo -l 2>/dev/null || echo "clinfo failed"
 echo "SYCL Devices (sycl-ls):"
 sycl-ls 2>/dev/null || echo "sycl-ls not found or failed"
 echo "Environment for Ollama:"
@@ -49,7 +62,8 @@ mkdir -p "$OLLAMA_MODELS"
 
 # Start Ollama in background
 echo "Starting Ollama Server..."
-ollama serve &
+# Use the local ollama binary created by init-ollama
+./ollama serve &
 PID=$!
 
 # Wait for Ollama to start
