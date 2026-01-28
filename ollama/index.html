@@ -24,6 +24,7 @@
         Status: <span id="connection-status">Checking...</span> |
         Model: <select id="model-select"><option>Loading...</option></select>
         <button id="delete-btn" onclick="deleteModel()" style="background: #dc3545; padding: 5px 10px; margin-left: 10px;">Delete</button>
+        <span id="running-model" style="margin-left: 10px; color: #007bff; font-size: 0.9em;"></span>
     </div>
     <div id="chat-container"></div>
     <div id="input-area">
@@ -37,10 +38,29 @@
         const sendBtn = document.getElementById('send-btn');
         const modelSelect = document.getElementById('model-select');
         const statusSpan = document.getElementById('connection-status');
+        const runningModelSpan = document.getElementById('running-model');
 
         let currentModel = '';
 
+        async function checkRunningModel() {
+            try {
+                const response = await fetch('api/ps');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.models && data.models.length > 0) {
+                        const running = data.models.map(m => m.name).join(', ');
+                        runningModelSpan.textContent = `Running: ${running}`;
+                    } else {
+                        runningModelSpan.textContent = 'Running: None';
+                    }
+                }
+            } catch (e) {
+                console.error("Error fetching running models", e);
+            }
+        }
+
         async function fetchModels() {
+            checkRunningModel();
             try {
                 // Use relative path for Ingress compatibility
                 const response = await fetch('api/tags');
