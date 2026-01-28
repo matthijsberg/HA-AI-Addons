@@ -12,7 +12,8 @@ privileged:
   - SYS_ADMIN
   - SYS_RAWIO
   - SYS_PTRACE
-full_access: true
+host_ipc: true
+udev: true
 devices:
   - /dev/dri:/dev/dri
   - /dev/accel:/dev/accel
