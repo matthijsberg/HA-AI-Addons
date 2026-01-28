@@ -4,9 +4,13 @@ FROM $BUILD_FROM
 # Install dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
+    ca-certificates \
+    gpg \
+    wget \
     python3 \
     python3-pip \
     python3-psutil \
+    clinfo \
     intel-opencl-icd \
     intel-level-zero-gpu \
     level-zero \
@@ -15,8 +19,21 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libvpl2 \
     && rm -rf /var/lib/apt/lists/*
 
+# Add Intel oneAPI repository for SYCL/Level Zero runtimes
+RUN wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor | tee /usr/share/keyrings/oneapi-archive-keyring.gpg > /dev/null \
+    && echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" | tee /etc/apt/sources.list.d/oneAPI.list \
+    && apt-get update && apt-get install -y --no-install-recommends \
+    intel-oneapi-runtime-mkl \
+    intel-oneapi-runtime-libs \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set environment variables for hardware acceleration
+ENV OLLAMA_INTEL_GPU=1
+ENV ZES_ENABLE_SYSMAN=1
+ENV OLLAMA_HOST="0.0.0.0"
+ENV OLLAMA_MODELS="/share/ollama/models"
+
 # Install Ollama
-# We use the install script which detects arch
 RUN curl -fsSL https://ollama.com/install.sh | sh
 
 # Copy files

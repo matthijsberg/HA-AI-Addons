@@ -22,10 +22,22 @@ else
     echo "Using Selected Model: $MODEL"
 fi
 
-# Configure Ollama environment
+# Hardware Diagnostics
+echo "--- Hardware Diagnostics ---"
+echo "Checking /dev/dri:"
+ls -l /dev/dri 2>/dev/null || echo "No /dev/dri found"
+echo "Checking /dev/accel:"
+ls -l /dev/accel 2>/dev/null || echo "No /dev/accel found"
+echo "OpenCL Info (clinfo):"
+clinfo -l 2>/dev/null || echo "clinfo failed"
+echo "Environment for Ollama:"
+env | grep OLLAMA || true
+echo "---------------------------"
+
+# Configure Ollama environment (redundant with ENV but kept for safety)
 export OLLAMA_HOST="0.0.0.0"
-export OLLAMA_MODELS="/share/ollama/models" # Persist models in /share
-export OLLAMA_INTEL_GPU="true"
+export OLLAMA_MODELS="/share/ollama/models"
+export OLLAMA_INTEL_GPU="1"
 export ZES_ENABLE_SYSMAN=1
 
 mkdir -p "$OLLAMA_MODELS"
