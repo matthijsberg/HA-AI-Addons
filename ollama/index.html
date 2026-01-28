@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ollama Chat</title>
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background: #f0f0f0; }
+        #chat-container { background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); height: 60vh; overflow-y: auto; display: flex; flex-direction: column; }
+        .message { margin-bottom: 10px; padding: 10px; border-radius: 5px; max-width: 80%; white-space: pre-wrap; }
+        .user { align-self: flex-end; background: #007bff; color: white; }
+        .assistant { align-self: flex-start; background: #e9ecef; color: black; }
+        #input-area { margin-top: 20px; display: flex; gap: 10px; }
+        input[type="text"] { flex-grow: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        button:disabled { background: #ccc; }
+        #status { margin-bottom: 10px; font-size: 0.9em; color: #666; }
+        select { padding: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Ollama Chat</h1>
+    <div id="status">
+        Status: <span id="connection-status">Checking...</span> | 
+        Model: <select id="model-select"><option>Loading...</option></select>
+    </div>
+    <div id="chat-container"></div>
+    <div id="input-area">
+        <input type="text" id="user-input" placeholder="Type a message..." onkeypress="if(event.key==='Enter') sendMessage()">
+        <button onclick="sendMessage()" id="send-btn">Send</button>
+    </div>
+
+    <script>
+        const chatContainer = document.getElementById('chat-container');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+        const modelSelect = document.getElementById('model-select');
+        const statusSpan = document.getElementById('connection-status');
+
+        let currentModel = '';
+
+        async function fetchModels() {
+            try {
+                const response = await fetch('/api/tags');
+                if (response.ok) {
+                    const data = await response.json();
+                    modelSelect.innerHTML = '';
+                    if (data.models && data.models.length > 0) {
+                        data.models.forEach(model => {
+                            const option = document.createElement('option');
+                            option.value = model.name;
+                            option.textContent = model.name;
+                            modelSelect.appendChild(option);
+                        });
+                        // Select the first one or keep selection
+                        if (currentModel && Array.from(modelSelect.options).some(o => o.value === currentModel)) {
+                            modelSelect.value = currentModel;
+                        } else {
+                            currentModel = modelSelect.value;
+                        }
+                        statusSpan.textContent = 'Connected';
+                        statusSpan.style.color = 'green';
+                    } else {
+                        const option = document.createElement('option');
+                        option.textContent = "No models found";
+                        modelSelect.appendChild(option);
+                        statusSpan.textContent = 'Connected (No models)';
+                    }
+                } else {
+                    throw new Error('Failed to fetch models');
+                }
+            } catch (error) {
+                console.error(error);
+                statusSpan.textContent = 'Disconnected';
+                statusSpan.style.color = 'red';
+                modelSelect.innerHTML = '<option>Error loading models</option>';
+            }
+        }
+
+        modelSelect.addEventListener('change', (e) => {
+            currentModel = e.target.value;
+        });
+
+        function appendMessage(role, text) {
+            const div = document.createElement('div');
+            div.className = `message ${role}`;
+            div.textContent = text;
+            chatContainer.appendChild(div);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+            return div;
+        }
+
+        async function sendMessage() {
+            const text = userInput.value.trim();
+            if (!text) return;
+            if (!currentModel) {
+                alert("Please select a model first.");
+                return;
+            }
+
+            userInput.value = '';
+            userInput.disabled = true;
+            sendBtn.disabled = true;
+            appendMessage('user', text);
+
+            const assistantMsgDiv = appendMessage('assistant', '...');
+            let fullResponse = '';
+
+            try {
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        model: currentModel,
+                        messages: [{ role: 'user', content: text }],
+                        stream: true
+                    })
+                });
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+
+                while (true) {
+                    const { done, value } = await reader.read();
+                    if (done) break;
+                    
+                    const chunk = decoder.decode(value, { stream: true });
+                    const lines = chunk.split('\n');
+                    
+                    for (const line of lines) {
+                        if (!line.trim()) continue;
+                        try {
+                            const json = JSON.parse(line);
+                            if (json.message && json.message.content) {
+                                if (fullResponse === '') assistantMsgDiv.textContent = ''; // Clear loading dots
+                                fullResponse += json.message.content;
+                                assistantMsgDiv.textContent = fullResponse;
+                                chatContainer.scrollTop = chatContainer.scrollHeight;
+                            }
+                            if (json.done) {
+                                // Done
+                            }
+                        } catch (e) {
+                            console.error("Error parsing JSON chunk", e);
+                        }
+                    }
+                }
+
+            } catch (error) {
+                assistantMsgDiv.textContent = "Error: " + error.message;
+            } finally {
+                userInput.disabled = false;
+                sendBtn.disabled = false;
+                userInput.focus();
+            }
+        }
+
+        // Initial load
+        fetchModels();
+        // Refresh models every 30s
+        setInterval(fetchModels, 30000);
+    </script>
+</body>
+</html>

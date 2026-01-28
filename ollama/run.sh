@@ -109,5 +109,10 @@ echo " Ollama is running and model '$MODEL' is loaded.    "
 echo " Internal URL: http://ollama:11434                  "
 echo "----------------------------------------------------"
 
+# Start Web UI
+echo "Starting Web UI..."
+python3 /web_server.py &
+WEB_PID=$!
+
 # Wait for process
-wait $PID
+wait $PID $WEB_PID

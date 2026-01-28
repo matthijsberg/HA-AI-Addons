@@ -4,6 +4,8 @@ FROM intelanalytics/ipex-llm-inference-cpp-xpu:latest
 # Install python dependencies for our helper scripts
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-psutil \
+    python3-requests \
+    jq \
     && rm -rf /var/lib/apt/lists/*
 
 # Set environment variables for hardware acceleration
@@ -18,6 +20,8 @@ ENV OLLAMA_MODELS="/share/ollama/models"
 COPY run.sh /
 COPY check_hardware.py /
 COPY fetch_models.py /
+COPY web_server.py /
+COPY index.html /
 
 RUN chmod a+x /run.sh
 
