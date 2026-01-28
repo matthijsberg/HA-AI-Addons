@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3-psutil \
     python3-requests \
     jq \
+    zstd \
     && rm -rf /var/lib/apt/lists/*
 
 # Set environment variables for hardware acceleration

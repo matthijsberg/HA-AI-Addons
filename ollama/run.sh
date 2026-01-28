@@ -159,11 +159,15 @@ if ./ollama list | grep -q "$MODEL"; then
     MODEL_READY=true
 else
     echo "Model '$MODEL' not found. Downloading (this may take several minutes)..."
-    if ./ollama pull "$MODEL"; then
+    ./ollama pull "$MODEL"
+    
+    # Check if model exists in list to confirm success
+    if ./ollama list | grep -q "$MODEL"; then
         echo "Model '$MODEL' downloaded successfully."
         MODEL_READY=true
     else
         echo "Error: Failed to download model '$MODEL'."
+        MODEL_READY=false
     fi
 fi
 
