@@ -30,15 +30,20 @@ echo "Checking /dev/accel:"
 ls -l /dev/accel 2>/dev/null || echo "No /dev/accel found"
 echo "OpenCL Info (clinfo):"
 clinfo -l 2>/dev/null || echo "clinfo failed"
+echo "SYCL Devices (sycl-ls):"
+sycl-ls 2>/dev/null || echo "sycl-ls not found or failed"
 echo "Environment for Ollama:"
-env | grep OLLAMA || true
+env | grep -E "OLLAMA|DEVICE|ZES|ONEAPI" || true
 echo "---------------------------"
 
-# Configure Ollama environment (redundant with ENV but kept for safety)
+# Configure Ollama environment
 export OLLAMA_HOST="0.0.0.0"
 export OLLAMA_MODELS="/share/ollama/models"
 export OLLAMA_INTEL_GPU="1"
 export ZES_ENABLE_SYSMAN=1
+export DEVICE="NPU"
+export OLLAMA_NUM_GPU=999
+export ONEAPI_DEVICE_SELECTOR="level_zero:0"
 
 mkdir -p "$OLLAMA_MODELS"
 

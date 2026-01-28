@@ -30,10 +30,13 @@ RUN wget -O- https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRO
 # Set environment variables for hardware acceleration
 ENV OLLAMA_INTEL_GPU=1
 ENV ZES_ENABLE_SYSMAN=1
+ENV DEVICE=NPU
+ENV OLLAMA_NUM_GPU=999
+ENV ONEAPI_DEVICE_SELECTOR=level_zero:0
 ENV OLLAMA_HOST="0.0.0.0"
 ENV OLLAMA_MODELS="/share/ollama/models"
 
-# Install Ollama
+# Install Ollama (force update to latest)
 RUN curl -fsSL https://ollama.com/install.sh | sh
 
 # Copy files
