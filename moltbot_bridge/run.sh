@@ -30,8 +30,13 @@ export WHATSAPP_FROM=$(jq --raw-output '.whatsapp_from // empty' $CONFIG_PATH)
 echo "Setting up Moltbot..."
 
 # 1. Get Config
-GEMINI_KEY=$(jq -r '.gemini_api_key // empty' $CONFIG_PATH)
+LLM_PROVIDER=$(jq -r '.llm_provider // "google-genai"' $CONFIG_PATH)
 MODEL_NAME=$(jq -r '.model_name // "gemini-3.0-flash"' $CONFIG_PATH)
+
+GEMINI_KEY=$(jq -r '.gemini_api_key // empty' $CONFIG_PATH)
+OPENAI_KEY=$(jq -r '.openai_api_key // empty' $CONFIG_PATH)
+ANTHROPIC_KEY=$(jq -r '.anthropic_api_key // empty' $CONFIG_PATH)
+OLLAMA_URL=$(jq -r '.ollama_url // "http://localhost:11434"' $CONFIG_PATH)
 
 # 2. Install Moltbot (global)
 echo "Installing/Updating Moltbot..."
@@ -43,7 +48,7 @@ mkdir -p "$MOLTBOT_DIR"
 CONFIG_FILE="$MOLTBOT_DIR/clawdbot.json"
 
 # Always create or update the config file to prevent "Missing config" error
-echo "Updating Moltbot configuration..."
+echo "Updating Moltbot configuration for provider: $LLM_PROVIDER..."
 # Minimal config only
 cat > "$CONFIG_FILE" <<EOF
 {
@@ -57,28 +62,53 @@ cat > "$CONFIG_FILE" <<EOF
 }
 EOF
 
-if [ -n "$GEMINI_KEY" ] && [ "$GEMINI_KEY" != "null" ]; then
-    echo "Gemini API Key detected. Setting environment variable."
+# Set Environment Variables and Config based on Provider
+case "$LLM_PROVIDER" in
+  "google-genai")
+    if [ -n "$GEMINI_KEY" ] && [ "$GEMINI_KEY" != "null" ]; then
+        echo "Configuring for Google Gemini..."
+        export GOOGLE_API_KEY="$GEMINI_KEY"
+    else
+        echo "WARNING: Google Provider selected but No Gemini API Key provided."
+    fi
+    ;;
+  "openai")
+    if [ -n "$OPENAI_KEY" ] && [ "$OPENAI_KEY" != "null" ]; then
+        echo "Configuring for OpenAI..."
+        export OPENAI_API_KEY="$OPENAI_KEY"
+    else
+        echo "WARNING: OpenAI Provider selected but No OpenAI API Key provided."
+    fi
+    ;;
+  "anthropic")
+    if [ -n "$ANTHROPIC_KEY" ] && [ "$ANTHROPIC_KEY" != "null" ]; then
+        echo "Configuring for Anthropic..."
+        export ANTHROPIC_API_KEY="$ANTHROPIC_KEY"
+    else
+        echo "WARNING: Anthropic Provider selected but No Anthropic API Key provided."
+    fi
+    ;;
+  "ollama")
+    echo "Configuring for Local Ollama..."
+    # Standard Ollama env var, Moltbot should respect this
+    export OLLAMA_BASE_URL="$OLLAMA_URL"
+    ;;
+  *)
+    echo "Unknown provider: $LLM_PROVIDER. Defaulting to Google GenAI setup..."
     export GOOGLE_API_KEY="$GEMINI_KEY"
-    
-    # Use CLI to set config values (safest way to avoid schema errors)
-    # We try both potential key structures since schema is undocumented
-    echo "Setting up Gemini provider via CLI..."
-    
-    # Try setting provider/model. If these keys are wrong, the CLI might warn but likely won't crash.
-    # Common Clawdbot patterns:
-    clawdbot config set llm.provider google-genai || true
-    clawdbot config set llm.model "$MODEL_NAME" || true
-    
-    # Also try setting as root keys if the above failed silently or just in case
-    clawdbot config set provider google-genai || true
-    clawdbot config set model "$MODEL_NAME" || true
-    
-else
-    echo "WARNING: No Gemini API Key provided. Use the add-on Configuration tab to add it."
-fi
+    ;;
+esac
 
-# 4. Start Moltbot in background
+# 4. CLI Configuration (Safest way)
+echo "Applying settings via CLI..."
+
+# Set keys using CLI just to be safe (though env vars usually suffice for keys)
+clawdbot config set llm.provider "$LLM_PROVIDER" || true
+clawdbot config set llm.model "$MODEL_NAME" || true
+clawdbot config set provider "$LLM_PROVIDER" || true
+clawdbot config set model "$MODEL_NAME" || true
+
+# 5. Start Moltbot in background
 echo "Starting Moltbot Gateway..."
 # Use --allow-unconfigured to ensure it starts even if some keys are missing initially
 clawdbot gateway --port 18789 --allow-unconfigured &

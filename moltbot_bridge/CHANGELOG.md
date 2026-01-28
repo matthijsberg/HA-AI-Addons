@@ -5,6 +5,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.15] - 2024-01-27
+### Added
+- **Multi-Provider Support**: Users can now select their LLM provider via the new `llm_provider` configuration option.
+- **Provider Options**: Added schemas for `google-genai` (Gemini), `openai`, `anthropic`, and `ollama`.
+- **API Keys**: Added `openai_api_key` and `anthropic_api_key` configuration fields.
+- **Local Model Support**: Added `ollama_url` configuration to connect to local or external Ollama instances.
+
 ## [0.1.14] - 2024-01-27
 ### Fixed
 - Fixed invalid `clawdbot.json` schema error by using the CLI (`clawdbot config set`) to configure the LLM provider and model instead of writing raw JSON.
