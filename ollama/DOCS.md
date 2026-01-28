@@ -35,3 +35,12 @@ This add-on is built on top of Intel IPEX-LLM and supports:
 - Intel Core Ultra Processors (Series 1 and 2) with NPU
 - Intel Arc Graphics (Discrete and Integrated)
 - Intel Iris Xe Graphics
+
+## Technical Details
+
+**Base Image:** `intelanalytics/ipex-llm-inference-cpp-xpu:latest`
+
+This add-on uses the Intel IPEX-LLM container for hardware acceleration on Intel GPUs.
+- **Docker Hub:** [intelanalytics/ipex-llm-inference-cpp-xpu](https://hub.docker.com/r/intelanalytics/ipex-llm-inference-cpp-xpu)
+- **Documentation:** [IPEX-LLM Documentation](https://github.com/intel-analytics/ipex-llm)
+- **Ollama:** [Ollama Website](https://ollama.com)
