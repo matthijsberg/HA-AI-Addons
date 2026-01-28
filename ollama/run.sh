@@ -1,4 +1,4 @@
-#!/usr/bin/with-contenv bashio
+#!/bin/bash
 
 # Enable strict mode
 set -e
@@ -12,8 +12,18 @@ echo "Analyzing system resources..."
 python3 /check_hardware.py
 
 # Retrieve configuration
-MODEL=$(bashio::config 'model')
-CUSTOM_MODEL=$(bashio::config 'custom_model')
+if [ -f /data/options.json ]; then
+    MODEL=$(jq -r '.model // empty' /data/options.json)
+    CUSTOM_MODEL=$(jq -r '.custom_model // empty' /data/options.json)
+    DEVICE_TYPE=$(jq -r '.device_type // "NPU"' /data/options.json)
+else
+    MODEL=${MODEL:-"llama3:8b"}
+    CUSTOM_MODEL=${CUSTOM_MODEL:-""}
+    DEVICE_TYPE=${DEVICE_TYPE:-"NPU"}
+fi
+
+# Set DEVICE for IPEX init
+DEVICE="$DEVICE_TYPE"
 
 if [ ! -z "$CUSTOM_MODEL" ]; then
     echo "Using Custom Model: $CUSTOM_MODEL"
@@ -54,7 +64,7 @@ export OLLAMA_HOST="0.0.0.0"
 export OLLAMA_MODELS="/share/ollama/models"
 export OLLAMA_INTEL_GPU="1"
 export ZES_ENABLE_SYSMAN=1
-export DEVICE="NPU"
+export DEVICE="$DEVICE_TYPE"
 export OLLAMA_NUM_GPU=999
 export ONEAPI_DEVICE_SELECTOR="level_zero:0"
 
@@ -83,11 +93,11 @@ fi
 echo "Ollama API is active!"
 
 # Pull the requested model if not present
-if ollama list | grep -q "$MODEL"; then
+if ./ollama list | grep -q "$MODEL"; then
     echo "Model '$MODEL' is cached and ready."
 else
     echo "Model '$MODEL' not found. Downloading (this may take several minutes)..."
-    ollama pull "$MODEL"
+    ./ollama pull "$MODEL"
 fi
 
 echo "----------------------------------------------------"
