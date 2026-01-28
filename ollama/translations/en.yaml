@@ -1,0 +1,10 @@
+configuration:
+  keep_alive:
+    name: Keep Alive Duration
+    description: "Time to keep the model loaded in memory. Set to '-1' to keep loaded indefinitely (improves performance), or use format like '5m', '1h'."
+  device_type:
+    name: Device Type
+    description: "Hardware accelerator to use. Supports Intel NPU, iGPU (Integrated Graphics), and Discrete GPU."
+  model:
+    name: Model
+    description: "Select the LLM model to run."
