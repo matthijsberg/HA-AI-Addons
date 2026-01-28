@@ -41,7 +41,8 @@
 
         async function fetchModels() {
             try {
-                const response = await fetch('/api/tags');
+                // Use relative path for Ingress compatibility
+                const response = await fetch('api/tags');
                 if (response.ok) {
                     const data = await response.json();
                     modelSelect.innerHTML = '';
@@ -107,7 +108,8 @@
             let fullResponse = '';
 
             try {
-                const response = await fetch('/api/chat', {
+                // Use relative path for Ingress compatibility
+                const response = await fetch('api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
