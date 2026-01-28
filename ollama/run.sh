@@ -24,6 +24,10 @@ fi
 
 # Set DEVICE for IPEX init
 DEVICE="$DEVICE_TYPE"
+# Map generic GPU to iGPU for IPEX init if needed
+if [ "$DEVICE" = "GPU" ]; then
+    DEVICE="iGPU"
+fi
 
 if [ ! -z "$CUSTOM_MODEL" ]; then
     echo "Using Custom Model: $CUSTOM_MODEL"
