@@ -23,18 +23,24 @@ class ProxyHandler(http.server.SimpleHTTPRequestHandler):
         else:
             self.send_error(404)
 
+    def do_DELETE(self):
+        if self.path.startswith("/api/") or self.path.startswith("/v1/"):
+            self.proxy_request("DELETE")
+        else:
+            self.send_error(404)
+
     def proxy_request(self, method):
         url = f"{OLLAMA_URL}{self.path}"
         try:
-            if method == "POST":
+            headers = {k: v for k, v in self.headers.items() if k.lower() != 'host'}
+            
+            body = None
+            if method in ["POST", "DELETE", "PUT", "PATCH"]:
                 content_length = int(self.headers.get('Content-Length', 0))
-                body = self.rfile.read(content_length)
-                # Forward headers
-                headers = {k: v for k, v in self.headers.items() if k.lower() != 'host'}
-                resp = requests.post(url, data=body, headers=headers, stream=True)
-            else:
-                headers = {k: v for k, v in self.headers.items() if k.lower() != 'host'}
-                resp = requests.get(url, headers=headers, stream=True)
+                if content_length > 0:
+                    body = self.rfile.read(content_length)
+            
+            resp = requests.request(method, url, data=body, headers=headers, stream=True)
 
             self.send_response(resp.status_code)
             for key, value in resp.headers.items():
