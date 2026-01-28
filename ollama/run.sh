@@ -22,6 +22,12 @@ else
     DEVICE_TYPE=${DEVICE_TYPE:-"NPU"}
 fi
 
+# Smart fallback: If NPU is selected/defaulted but no hardware found, switch to CPU
+if [ "$DEVICE_TYPE" = "NPU" ] && [ ! -e "/dev/accel" ]; then
+    echo "Warning: NPU selected but /dev/accel not found. Falling back to CPU."
+    DEVICE_TYPE="CPU"
+fi
+
 # Set DEVICE for IPEX init
 DEVICE="$DEVICE_TYPE"
 # Map generic GPU to iGPU for IPEX init if needed
@@ -38,9 +44,13 @@ fi
 
 # IPEX and Ollama Initialization
 echo "--- IPEX Initialization ---"
-# Source the IPEX environment (this sets up SYCL and oneAPI paths)
-# Note: we use . because source might not be available in some shells
-. ipex-llm-init --gpu --device "$DEVICE" || echo "IPEX-LLM init failed, continuing anyway..."
+if [ "$DEVICE_TYPE" = "CPU" ]; then
+    echo "Running in CPU mode. Skipping IPEX GPU init."
+else
+    # Source the IPEX environment (this sets up SYCL and oneAPI paths)
+    # Note: we use . because source might not be available in some shells
+    . ipex-llm-init --gpu --device "$DEVICE" || echo "IPEX-LLM init failed, continuing anyway..."
+fi
 
 echo "--- Ollama Initialization ---"
 # The IPEX image expects ollama to be initialized in a specific way
@@ -67,11 +77,24 @@ echo "---------------------------"
 export OLLAMA_HOST="0.0.0.0"
 export OLLAMA_MODELS="/share/ollama/models"
 export OLLAMA_ORIGINS="*"
-export OLLAMA_INTEL_GPU="1"
-export ZES_ENABLE_SYSMAN=1
-export DEVICE="$DEVICE_TYPE"
-export OLLAMA_NUM_GPU=999
-export ONEAPI_DEVICE_SELECTOR="level_zero:0"
+
+if [ "$DEVICE_TYPE" != "CPU" ]; then
+    echo "Configuring environment for Intel $DEVICE_TYPE..."
+    export OLLAMA_INTEL_GPU="1"
+    export ZES_ENABLE_SYSMAN=1
+    export DEVICE="$DEVICE_TYPE"
+    export OLLAMA_NUM_GPU=999
+    export ONEAPI_DEVICE_SELECTOR="level_zero:0"
+else
+    echo "Configuring environment for CPU..."
+    # Ensure we don't accidentally force GPU
+    unset OLLAMA_INTEL_GPU
+    unset ONEAPI_DEVICE_SELECTOR
+    unset OLLAMA_NUM_GPU
+    unset ZES_ENABLE_SYSMAN
+    # Reset DEVICE to CPU just in case
+    export DEVICE="CPU"
+fi
 
 mkdir -p "$OLLAMA_MODELS"
 
