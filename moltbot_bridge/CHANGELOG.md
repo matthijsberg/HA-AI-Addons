@@ -5,6 +5,10 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.16] - 2024-01-28
+### Fixed
+- Fixed `Config validation failed` error by correctly using the `agent.model` configuration key (format: `provider/model`) instead of invalid root keys.
+
 ## [0.1.15] - 2024-01-27
 ### Added
 - **Multi-Provider Support**: Users can now select their LLM provider via the new `llm_provider` configuration option.

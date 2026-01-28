@@ -102,11 +102,14 @@ esac
 # 4. CLI Configuration (Safest way)
 echo "Applying settings via CLI..."
 
-# Set keys using CLI just to be safe (though env vars usually suffice for keys)
-clawdbot config set llm.provider "$LLM_PROVIDER" || true
-clawdbot config set llm.model "$MODEL_NAME" || true
-clawdbot config set provider "$LLM_PROVIDER" || true
-clawdbot config set model "$MODEL_NAME" || true
+# Construct the full model string (e.g., google-genai/gemini-3.0-flash)
+# This appears to be the standard format based on logs (anthropic/claude-opus...)
+FULL_MODEL="$LLM_PROVIDER/$MODEL_NAME"
+
+echo "Setting agent model to: $FULL_MODEL"
+
+# Set agent.model (Confirmed valid key)
+clawdbot config set agent.model "$FULL_MODEL" || true
 
 # 5. Start Moltbot in background
 echo "Starting Moltbot Gateway..."
