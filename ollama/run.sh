@@ -50,6 +50,13 @@ else
     # Source the IPEX environment (this sets up SYCL and oneAPI paths)
     # Note: we use . because source might not be available in some shells
     . ipex-llm-init --gpu --device "$DEVICE" || echo "IPEX-LLM init failed, continuing anyway..."
+
+    # Verify if SYCL actually sees a Level Zero device (Intel GPU)
+    # If not, fallback to CPU to avoid crash
+    if ! sycl-ls 2>/dev/null | grep -q "level_zero"; then
+        echo "Warning: No Level Zero SYCL device found (sycl-ls). Falling back to CPU."
+        DEVICE_TYPE="CPU"
+    fi
 fi
 
 echo "--- Ollama Initialization ---"
