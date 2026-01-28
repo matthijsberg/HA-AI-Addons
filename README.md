@@ -1,22 +1,18 @@
-# Moltbot-HA Bridge Add-on
+# HA AI Addons
 
-A Home Assistant Add-on that serves as a central intelligence bridge, inspired by the Moltbot framework. It connects Home Assistant, Google Ecosystems, and Messaging platforms (BlueBubbles for iMessage, WhatsApp) into a unified control agent.
+A collection of Home Assistant Add-ons focused on bringing advanced AI capabilities to your smart home.
 
-## Features
+## Included Add-ons
 
-- **Home Assistant Integration**: Full read/write access via WebSocket API.
-- **Messaging Bridge**:
-    - **iMessage**: via BlueBubbles Server.
-    - **WhatsApp**: via Twilio or Matrix Bridge.
-- **Google Integration**: OAuth2 connection for syncing device states.
-- **Secure**: Uses Home Assistant's internal secret management and strict config validation.
+1.  **Moltbot-HA Bridge**: A central intelligence bridge inspired by the Moltbot framework. Connects HA, Google, and Messaging platforms.
+2.  **Ollama Local**: A local LLM server based on Ollama, with hardware-aware model recommendations.
 
 ## Installation
 
 1.  In Home Assistant, navigate to **Settings** > **Add-ons** > **Add-on Store**.
 2.  Click the three-dot menu in the upper right and select **Repositories**.
-3.  Add the following URL: `https://github.com/matthijsberg/moltbot_bridge`
-4.  Once added, search for **Moltbot-HA Bridge Add-on** in the store and install it.
+3.  Add the following URL: `https://github.com/matthijsberg/HA-AI-Addons` (Renamed from `moltbot_bridge`)
+4.  Once added, you will see the add-ons available in the store.
 
 ## Configuration
 

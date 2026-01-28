@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -41,7 +42,7 @@
         header {
             padding: 1rem;
             background-color: var(--chat-bg);
-            border-bottom: 1px solid rgba(0,0,0,0.1);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
             text-align: center;
             font-weight: bold;
             font-size: 1.2rem;
@@ -66,7 +67,7 @@
         }
 
         .message.user {
-            align_self: flex-end;
+            align-self: flex-end;
             background-color: var(--message-user-bg);
             color: var(--message-user-text);
             border-bottom-right-radius: 0.2rem;
@@ -84,7 +85,7 @@
             background-color: var(--chat-bg);
             display: flex;
             gap: 0.5rem;
-            border-top: 1px solid rgba(0,0,0,0.1);
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
         }
 
         input {
@@ -116,13 +117,14 @@
         button:hover {
             opacity: 0.9;
         }
-        
+
         button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
         }
     </style>
 </head>
+
 <body>
     <header>Moltbot</header>
     <div id="chat-container">
@@ -137,10 +139,10 @@
         const chatContainer = document.getElementById('chat-container');
         const messageInput = document.getElementById('message-input');
         const sendBtn = document.getElementById('send-btn');
-        
+
         // Use relative path for API to work with Ingress
         // Ingress adds a dynamic path prefix, but relative requests handle it automatically.
-        const API_URL = 'api/chat'; 
+        const API_URL = 'api/chat';
 
         function addMessage(text, sender) {
             const div = document.createElement('div');
@@ -188,4 +190,5 @@
         });
     </script>
 </body>
+
 </html>

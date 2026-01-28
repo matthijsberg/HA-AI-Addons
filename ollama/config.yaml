@@ -1,0 +1,22 @@
+name: "Ollama (Local LLM)"
+version: "0.2.0"
+slug: "ollama"
+description: "Run Ollama locally for private, high-performance AI. Includes hardware-aware model recommendations."
+url: "https://github.com/matthijsberg/HA-AI-Addons"
+startup: application
+boot: auto
+arch:
+  - aarch64
+  - amd64
+ports:
+  11434/tcp: 11434
+map:
+  - config:rw
+  - share:rw
+options:
+  model: "llama3:8b"
+  custom_model: ""
+schema:
+  model: "list(llama3:8b|llama3:70b|phi3:3.8b|mistral:7b|gemma:7b|gemma:2b|tinyllama|codellama)"
+  custom_model: "str?"
+image: "ollama/ollama"
