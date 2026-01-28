@@ -13,9 +13,9 @@ python3 /check_hardware.py
 
 # Retrieve configuration
 if [ -f /data/options.json ]; then
-    MODEL=$(jq -r '.model // empty' /data/options.json)
-    CUSTOM_MODEL=$(jq -r '.custom_model // empty' /data/options.json)
-    DEVICE_TYPE=$(jq -r '.device_type // "NPU"' /data/options.json)
+    MODEL=$(python3 -c "import sys, json; print(json.load(open('/data/options.json')).get('model', '') or '')")
+    CUSTOM_MODEL=$(python3 -c "import sys, json; print(json.load(open('/data/options.json')).get('custom_model', '') or '')")
+    DEVICE_TYPE=$(python3 -c "import sys, json; print(json.load(open('/data/options.json')).get('device_type', 'NPU') or 'NPU')")
 else
     MODEL=${MODEL:-"llama3:8b"}
     CUSTOM_MODEL=${CUSTOM_MODEL:-""}
