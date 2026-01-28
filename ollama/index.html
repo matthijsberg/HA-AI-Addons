@@ -50,9 +50,11 @@
                     const data = await response.json();
                     if (data.models && data.models.length > 0) {
                         const running = data.models.map(m => m.name).join(', ');
-                        runningModelSpan.textContent = `Running: ${running}`;
+                        runningModelSpan.innerHTML = `<strong>Loaded Model:</strong> ${running}`;
+                        runningModelSpan.style.color = '#28a745';
                     } else {
-                        runningModelSpan.textContent = 'Running: None';
+                        runningModelSpan.textContent = 'Loaded Model: None (Idle)';
+                        runningModelSpan.style.color = '#666';
                     }
                 }
             } catch (e) {
@@ -218,7 +220,21 @@
                                 chatContainer.scrollTop = chatContainer.scrollHeight;
                             }
                             if (json.done) {
-                                // Done
+                                const totalDuration = (json.total_duration / 1e9).toFixed(2);
+                                const loadDuration = (json.load_duration / 1e9).toFixed(2);
+                                const evalCount = json.eval_count;
+                                const evalDuration = (json.eval_duration / 1e9).toFixed(2);
+                                const tps = evalDuration > 0 ? (evalCount / (json.eval_duration / 1e9)).toFixed(1) : "N/A";
+                                
+                                const metricsHtml = `
+                                    <div style="font-size: 0.75em; color: #888; margin-top: 8px; border-top: 1px solid #eee; padding-top: 4px;">
+                                        ⏱️ ${totalDuration}s (Load: ${loadDuration}s, Gen: ${evalDuration}s) &nbsp;|&nbsp;
+                                        🔤 ${evalCount} tokens (${tps} t/s)
+                                    </div>
+                                `;
+                                assistantMsgDiv.insertAdjacentHTML('beforeend', metricsHtml);
+                                chatContainer.scrollTop = chatContainer.scrollHeight;
+                                checkRunningModel(); // Update running model status immediately after generation
                             }
                         } catch (e) {
                             console.error("Error parsing JSON chunk", e);
@@ -237,8 +253,8 @@
 
         // Initial load
         fetchModels();
-        // Refresh models every 30s
-        setInterval(fetchModels, 30000);
+        // Refresh models every 5s to keep status updated
+        setInterval(fetchModels, 5000);
     </script>
 </body>
 </html>
