@@ -66,6 +66,7 @@ echo "---------------------------"
 # Configure Ollama environment
 export OLLAMA_HOST="0.0.0.0"
 export OLLAMA_MODELS="/share/ollama/models"
+export OLLAMA_ORIGINS="*"
 export OLLAMA_INTEL_GPU="1"
 export ZES_ENABLE_SYSMAN=1
 export DEVICE="$DEVICE_TYPE"
