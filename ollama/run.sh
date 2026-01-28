@@ -111,7 +111,12 @@ echo "----------------------------------------------------"
 
 # Start Web UI
 echo "Starting Web UI..."
-python3 /web_server.py &
+if ! python3 -c "import requests" 2>/dev/null; then
+    echo "Warning: python3-requests not found. Attempting to install..."
+    apt-get update && apt-get install -y python3-requests || echo "Failed to install requests"
+fi
+
+python3 -u /web_server.py 2>&1 &
 WEB_PID=$!
 
 # Wait for process
