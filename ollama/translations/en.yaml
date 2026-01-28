@@ -8,3 +8,6 @@ configuration:
   model:
     name: Model
     description: "Select the LLM model to run."
+  update_ollama:
+    name: Update Ollama
+    description: "Attempt to update Ollama to the latest official version on startup. WARNING: This might break Intel GPU acceleration if the official version doesn't support your hardware yet."

@@ -17,11 +17,13 @@ if [ -f /data/options.json ]; then
     CUSTOM_MODEL=$(python3 -c "import sys, json; print(json.load(open('/data/options.json')).get('custom_model', '') or '')")
     DEVICE_TYPE=$(python3 -c "import sys, json; print(json.load(open('/data/options.json')).get('device_type', 'NPU') or 'NPU')")
     KEEP_ALIVE=$(python3 -c "import sys, json; print(json.load(open('/data/options.json')).get('keep_alive', '5m') or '5m')")
+    UPDATE_OLLAMA=$(python3 -c "import sys, json; print(json.load(open('/data/options.json')).get('update_ollama', False))")
 else
     MODEL=${MODEL:-"llama3:8b"}
     CUSTOM_MODEL=${CUSTOM_MODEL:-""}
     DEVICE_TYPE=${DEVICE_TYPE:-"NPU"}
     KEEP_ALIVE=${KEEP_ALIVE:-"5m"}
+    UPDATE_OLLAMA="False"
 fi
 
 # Smart fallback: If NPU is selected/defaulted but no hardware found, switch to CPU
@@ -68,6 +70,24 @@ cd /llm/ollama
 if [ ! -f "./ollama" ]; then
     echo "Initializing Ollama binary..."
     init-ollama || echo "init-ollama failed"
+fi
+
+# Optional: Update Ollama to latest version
+if [ "$UPDATE_OLLAMA" = "True" ]; then
+    echo "--- Updating Ollama ---"
+    echo "Downloading and installing latest Ollama version..."
+    # Install to default location (/usr/local/bin/ollama)
+    curl -fsSL https://ollama.com/install.sh | sh || echo "Failed to download/install Ollama"
+    
+    if [ -f "/usr/local/bin/ollama" ]; then
+        echo "Overwriting local Ollama binary with updated version..."
+        cp /usr/local/bin/ollama ./ollama
+        chmod +x ./ollama
+        echo "Ollama updated successfully."
+        ./ollama --version
+    else
+        echo "Warning: Updated Ollama binary not found at /usr/local/bin/ollama"
+    fi
 fi
 
 # Hardware Diagnostics
