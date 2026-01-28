@@ -16,6 +16,7 @@ RUN curl -fsSL https://ollama.com/install.sh | sh
 # Copy files
 COPY run.sh /
 COPY check_hardware.py /
+COPY fetch_models.py /
 
 RUN chmod a+x /run.sh
 

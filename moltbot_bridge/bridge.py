@@ -145,6 +145,12 @@ class HomeAssistantClient:
         if self.connection:
             await self.connection.close()
 
+    async def update_addon_options(self, addon: str, options: Dict[str, Any]):
+        return await self.call_service("hassio", "addon_update", {
+            "addon": addon,
+            "options": options
+        })
+
 # --- Integration Stubs ---
 class GoogleIntegration:
     def __init__(self, services_json_path: str):
@@ -205,15 +211,9 @@ async def main():
             logger.info(f"Chat received: {user_message}")
             
             # Forward message to Moltbot Gateway
-            # Assuming Moltbot exposes a chat/completion endpoint. 
-            # Based on typical Gateway architecture, it might be /api/chat or similar.
-            # If plain gateway, we might need a specific client.
-            # For now, we try to POST to the gateway port.
-            
-            moltbot_url = "http://localhost:18789/api/chat" # Best guess standard endpoint
+            moltbot_url = "http://localhost:18789/api/chat"
             async with aiohttp.ClientSession() as session:
                 try:
-                    # Note: We might need to adjust payload format based on Moltbot's actual API
                     payload = {
                         "messages": [{"role": "user", "content": user_message}],
                         "stream": False 
@@ -221,7 +221,6 @@ async def main():
                     async with session.post(moltbot_url, json=payload) as resp:
                         if resp.status == 200:
                             data = await resp.json()
-                            # Try to extract content. Adjust key based on actual response
                             bot_text = data.get("content") or data.get("message") or str(data)
                             return web.json_response({'response': bot_text})
                         else:
@@ -236,7 +235,64 @@ async def main():
             logger.error(f"Chat error: {e}")
             return web.json_response({'error': str(e)}, status=500)
 
+    async def handle_available_models(request):
+        try:
+            logger.info("Fetching available models from Ollama...")
+            async with aiohttp.ClientSession() as session:
+                async with session.get("https://ollama.com/library") as resp:
+                    if resp.status != 200:
+                        return web.json_response({"error": "Failed to fetch library"}, status=500)
+                    html = await resp.text()
+                    
+                    # Simple regex to find /library/model-name
+                    import re
+                    pattern = r'href="/library/([^/"]+)"'
+                    models = re.findall(pattern, html)
+                    unique_models = sorted(list(set(models)))
+                    
+                    # Add variants for popular ones
+                    rich_models = []
+                    special_cases = {
+                        "gemma3": ["270m", "1b", "4b", "12b", "27b", "vision"],
+                        "llama3.2": ["1b", "3b"],
+                        "llama3.1": ["8b", "70b"],
+                        "phi3.5": ["latest"],
+                        "gemma2": ["2b", "9b", "27b"],
+                        "mistral": ["7b"]
+                    }
+                    
+                    for m in unique_models:
+                        variants = special_cases.get(m, ["latest"])
+                        rich_models.append({"name": m, "variants": variants})
+                        
+                    return web.json_response({"models": rich_models})
+        except Exception as e:
+            logger.error(f"Error fetching models: {e}")
+            return web.json_response({"error": str(e)}, status=500)
+
+    async def handle_select_model(request):
+        try:
+            data = await request.json()
+            model = data.get("model")
+            if not model:
+                return web.json_response({"error": "No model specified"}, status=400)
+            
+            logger.info(f"Setting Ollama model to: {model}")
+            # Update the Ollama add-on options via Home Assistant
+            resp = await ha_client.update_addon_options("ollama", {"model": model})
+            
+            if resp and resp.get("success"):
+                return web.json_response({"status": "ok", "message": f"Model set to {model}. Ollama will restart/pull the model."})
+            else:
+                return web.json_response({"error": "Failed to update add-on options", "details": resp}, status=500)
+                
+        except Exception as e:
+            logger.error(f"Error selecting model: {e}")
+            return web.json_response({"error": str(e)}, status=500)
+
     app.router.add_post('/api/chat', handle_chat)
+    app.router.add_get('/api/models/available', handle_available_models)
+    app.router.add_post('/api/models/select', handle_select_model)
     
     # Serve index.html explicitly to ensure Ingress finds it at root
     async def index(request):
