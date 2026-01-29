@@ -13,7 +13,7 @@ RUN OLLAMA_BACKENDS=sycl,vulkan go build .
 
 # STAGE 2: Optimized Runtime
 FROM ubuntu:24.04
-RUN apt-get update && apt-get install -y jq curl clinfo mesa-vulkan-drivers
+RUN apt-get update && apt-get install -y jq curl clinfo mesa-vulkan-drivers gnupg2
 RUN curl -fsSL https://repositories.intel.com/gpu/intel-graphics.key | gpg --dearmor -o /usr/share/keyrings/intel-graphics.gpg
 RUN echo "deb [arch=amd64 signed-by=/usr/share/keyrings/intel-graphics.gpg] https://repositories.intel.com/gpu/ubuntu noble client" > /etc/apt/sources.list.d/intel-gpu.list
 # Install runtime libraries
