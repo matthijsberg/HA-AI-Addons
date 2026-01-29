@@ -19,12 +19,18 @@ FROM ubuntu:24.04
 RUN apt-get update && apt-get install -y jq curl clinfo mesa-vulkan-drivers gnupg2
 RUN curl -fsSL https://repositories.intel.com/gpu/intel-graphics.key | gpg --dearmor -o /usr/share/keyrings/intel-graphics.gpg
 RUN echo "deb [arch=amd64 signed-by=/usr/share/keyrings/intel-graphics.gpg] https://repositories.intel.com/gpu/ubuntu noble client" > /etc/apt/sources.list.d/intel-gpu.list
+# Add Intel oneAPI repository for MKL and DPC++ Runtime
+RUN curl -fsSL https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor -o /usr/share/keyrings/oneapi-archive-keyring.gpg
+RUN echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" > /etc/apt/sources.list.d/oneAPI.list
 # Install runtime libraries
 RUN apt-get update && apt-get install -y \
     intel-opencl-icd \
     intel-level-zero-gpu \
     libze1 \
-    libvulkan1
+    libvulkan1 \
+    intel-oneapi-compiler-dpcpp-cpp-runtime \
+    intel-oneapi-mkl-core \
+    intel-oneapi-mkl-sycl
 COPY --from=builder /app/ollama /usr/bin/ollama
 COPY run.sh /run.sh
 RUN chmod a+x /run.sh

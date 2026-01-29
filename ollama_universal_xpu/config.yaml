@@ -1,7 +1,7 @@
 name: "Ollama (Universal XPU)"
 description: "Ollama LLM runner with Intel (SYCL/NPU), NVIDIA/AMD (Vulkan), and CPU support."
 url: "https://github.com/matthijsberg/HA-AI-Addons"
-version: "1.0.10"
+version: "1.0.11"
 slug: "ollama_universal_xpu"
 arch:
   - amd64
