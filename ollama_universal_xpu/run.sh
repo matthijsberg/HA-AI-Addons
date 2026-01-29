@@ -20,6 +20,18 @@ fi
 KERNEL_VER=$(uname -r)
 log_info "Host Environment -> OS: Ubuntu ${UBUNTU_VER}, Kernel: ${KERNEL_VER}"
 
+# Debug: Hardware Diagnostics
+log_info "--- Debug: /dev/dri Listing ---"
+ls -l /dev/dri 2>/dev/null || log_err "No /dev/dri found"
+
+log_info "--- Debug: clinfo Output ---"
+if command -v clinfo &> /dev/null; then
+    clinfo
+else
+    log_err "clinfo command not found"
+fi
+log_info "--- End Debug ---"
+
 # 2. Dynamic Backend Configuration
 CONFIG_PATH="/data/options.json"
 
