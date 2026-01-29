@@ -38,6 +38,9 @@ if command -v clinfo &> /dev/null; then
 else
     log_err "clinfo command not found"
 fi
+log_info "--- Debug: Library Locations ---"
+ls -l /usr/lib/x86_64-linux-gnu/libze* 2>/dev/null || log_info "No libze found in /usr/lib/x86_64-linux-gnu/"
+ls -l /usr/lib/libze* 2>/dev/null || log_info "No libze found in /usr/lib/"
 log_info "--- End Debug ---"
 
 # 2. Dynamic Backend Configuration
@@ -59,7 +62,7 @@ log_info "Configuring for ${ACCEL_CHOICE} (Index: ${GPU_IDX})..."
 case $ACCEL_CHOICE in
   "gpu")
     # Intel-specific SYCL/oneAPI Path
-    export ONEAPI_DEVICE_SELECTOR="level_zero:${GPU_IDX}"
+    # export ONEAPI_DEVICE_SELECTOR="level_zero:${GPU_IDX}"
     export OLLAMA_NUM_GPU=999
     ;;
   "npu")
