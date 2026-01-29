@@ -9,6 +9,18 @@ log_err() {
     echo "[ERROR] $1" >&2
 }
 
+echo "
+  ██████╗ ██╗     ██╗      █████╗ ███╗   ███╗ █████╗
+ ██╔═══██╗██║     ██║     ██╔══██╗████╗ ████║██╔══██╗
+ ██║   ██║██║     ██║     ███████║██╔████╔██║███████║
+ ██║   ██║██║     ██║     ██╔══██║██║╚██╔╝██║██╔══██║
+ ╚██████╔╝███████╗███████╗██║  ██║██║ ╚═╝ ██║██║  ██║
+  ╚═════╝ ╚══════╝╚══════╝╚═╝  ╚═╝╚═╝     ╚═╝╚═╝  ╚═╝
+                                                     
+  Universal XPU Edition (Intel/NVIDIA/AMD/CPU)
+  Maintained by: Matthijs van den Berg
+"
+
 log_info "--- OLLAMA UNIVERSAL ACCELERATION STARTUP ---"
 
 # 0. Initialize Intel oneAPI Environment (if present)
