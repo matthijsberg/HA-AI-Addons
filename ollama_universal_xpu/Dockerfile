@@ -1,6 +1,6 @@
 # STAGE 1: Builder
 FROM ubuntu:24.04 AS builder
-RUN apt-get update && apt-get install -y curl gnupg2 cmake git build-essential golang-1.22
+RUN apt-get update && apt-get install -y curl gnupg2 cmake git build-essential golang
 # Install Intel repositories for SYCL/oneAPI
 RUN curl -fsSL https://repositories.intel.com/gpu/intel-graphics.key | gpg --dearmor -o /usr/share/keyrings/intel-graphics.gpg
 RUN echo "deb [arch=amd64 signed-by=/usr/share/keyrings/intel-graphics.gpg] https://repositories.intel.com/gpu/ubuntu noble client unified" > /etc/apt/sources.list.d/intel-gpu.list
