@@ -30,8 +30,8 @@ options:
   debug_mode: true
 schema:
   accelerator: list(gpu|npu|vulkan|cpu)
-  gpu_index: int(0, 4)           # Support for multi-GPU systems
-  memory_limit: int(1024, 32768) # Hard container RAM limit
-  shm_size: int(512, 16384)      # Shared memory size (50% of limit recommended)
+  gpu_index: int(0,4)           # Support for multi-GPU systems
+  memory_limit: int(1024,32768) # Hard container RAM limit
+  shm_size: int(512,16384)      # Shared memory size (50% of limit recommended)
   keep_alive: str
   debug_mode: bool
