@@ -4,6 +4,9 @@ RUN apt-get update && apt-get install -y curl gnupg2 cmake git build-essential g
 # Install Intel repositories for SYCL/oneAPI
 RUN curl -fsSL https://repositories.intel.com/gpu/intel-graphics.key | gpg --dearmor -o /usr/share/keyrings/intel-graphics.gpg
 RUN echo "deb [arch=amd64 signed-by=/usr/share/keyrings/intel-graphics.gpg] https://repositories.intel.com/gpu/ubuntu noble client unified" > /etc/apt/sources.list.d/intel-gpu.list
+# Add Intel oneAPI repository for MKL
+RUN curl -fsSL https://apt.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB | gpg --dearmor -o /usr/share/keyrings/oneapi-archive-keyring.gpg
+RUN echo "deb [signed-by=/usr/share/keyrings/oneapi-archive-keyring.gpg] https://apt.repos.intel.com/oneapi all main" > /etc/apt/sources.list.d/oneAPI.list
 RUN apt-get update && apt-get install -y intel-oneapi-mkl-devel-2025.0 libvulkan-dev
 # Build Ollama with multi-backend support
 RUN git clone https://github.com/ollama/ollama.git /app
