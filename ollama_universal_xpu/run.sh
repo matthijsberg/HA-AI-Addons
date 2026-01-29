@@ -41,6 +41,10 @@ fi
 log_info "--- Debug: Library Locations ---"
 ls -l /usr/lib/x86_64-linux-gnu/libze* 2>/dev/null || log_info "No libze found in /usr/lib/x86_64-linux-gnu/"
 ls -l /usr/lib/libze* 2>/dev/null || log_info "No libze found in /usr/lib/"
+log_info "Searching for libsycl.so..."
+find / -name "libsycl.so*" 2>/dev/null || log_info "libsycl.so not found via find"
+log_info "Searching for setvars.sh..."
+find / -name "setvars.sh" 2>/dev/null || log_info "setvars.sh not found via find"
 log_info "--- End Debug ---"
 
 # 2. Dynamic Backend Configuration
