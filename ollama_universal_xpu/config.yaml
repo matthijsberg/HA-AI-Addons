@@ -1,8 +1,9 @@
 name: "Ollama (Universal XPU)"
 description: "Ollama LLM runner with Intel (SYCL/NPU), NVIDIA/AMD (Vulkan), and CPU support."
 url: "https://github.com/matthijsberg/HA-AI-Addons"
-version: "1.0.17"
+version: "1.0.18"
 slug: "ollama_universal_xpu"
+full_access: true
 arch:
   - amd64
 startup: "application"
@@ -17,6 +18,8 @@ devices:
 privileged:
   - PERFMON # Required for VRAM telemetry
   - SYS_ADMIN # Required for unified memory architectures
+  - SYS_RAWIO
+  - SYS_PTRACE
 map:
   - share:rw
   - addon_config:rw
