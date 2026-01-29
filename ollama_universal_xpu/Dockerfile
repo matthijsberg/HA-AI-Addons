@@ -20,7 +20,7 @@ RUN echo "deb [arch=amd64 signed-by=/usr/share/keyrings/intel-graphics.gpg] http
 RUN apt-get update && apt-get install -y \
     intel-opencl-icd \
     intel-level-zero-gpu \
-    level-zero \
+    libze1 \
     libvulkan1
 COPY --from=builder /app/ollama /usr/bin/ollama
 COPY run.sh /run.sh
