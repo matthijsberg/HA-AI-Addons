@@ -30,6 +30,19 @@ if [ -f /opt/intel/oneapi/setvars.sh ]; then
     
     # Explicitly add Intel libs to LD_LIBRARY_PATH to ensure visibility
     export LD_LIBRARY_PATH=/opt/intel/oneapi/compiler/latest/linux/lib:/opt/intel/oneapi/mkl/latest/lib/intel64:$LD_LIBRARY_PATH
+
+    # Create symlinks for oneAPI libraries in /usr/lib to ensure dynamic linker finds them
+    log_info "Creating symlinks for oneAPI libraries in /usr/lib..."
+    ln -sf /opt/intel/oneapi/compiler/latest/linux/lib/libsycl.so /usr/lib/libsycl.so
+    ln -sf /opt/intel/oneapi/compiler/latest/linux/lib/libsycl.so.7 /usr/lib/libsycl.so.7
+    
+    MKL_PATH="/opt/intel/oneapi/mkl/latest/lib/intel64"
+    if [ -d "$MKL_PATH" ]; then
+        ln -sf "$MKL_PATH"/libmkl_sycl.so /usr/lib/libmkl_sycl.so
+        ln -sf "$MKL_PATH"/libmkl_intel_ilp64.so /usr/lib/libmkl_intel_ilp64.so
+        ln -sf "$MKL_PATH"/libmkl_sequential.so /usr/lib/libmkl_sequential.so
+        ln -sf "$MKL_PATH"/libmkl_core.so /usr/lib/libmkl_core.so
+    fi
 else
     log_info "Intel oneAPI setvars.sh not found. Skipping."
 fi
