@@ -21,7 +21,6 @@ RUN apt-get update && apt-get install -y \
     intel-opencl-icd \
     intel-level-zero-gpu \
     level-zero \
-    linux-npu-driver \
     libvulkan1
 COPY --from=builder /app/ollama /usr/bin/ollama
 COPY run.sh /run.sh
