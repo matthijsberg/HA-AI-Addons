@@ -27,6 +27,9 @@ log_info "--- OLLAMA UNIVERSAL ACCELERATION STARTUP ---"
 if [ -f /opt/intel/oneapi/setvars.sh ]; then
     log_info "Sourcing Intel oneAPI environment variables..."
     source /opt/intel/oneapi/setvars.sh
+    
+    # Explicitly add Intel libs to LD_LIBRARY_PATH to ensure visibility
+    export LD_LIBRARY_PATH=/opt/intel/oneapi/compiler/latest/linux/lib:/opt/intel/oneapi/mkl/latest/lib/intel64:$LD_LIBRARY_PATH
 else
     log_info "Intel oneAPI setvars.sh not found. Skipping."
 fi
