@@ -6,6 +6,7 @@ A collection of Home Assistant Add-ons focused on bringing advanced AI capabilit
 
 1.  **Moltbot-HA Bridge**: A central intelligence bridge inspired by the Moltbot framework. Connects HA, Google, and Messaging platforms.
 2.  **Ollama Local**: A local LLM server based on Ollama, with hardware-aware model recommendations.
+3.  **Ollama (Universal XPU)**: Ollama LLM runner with Intel (SYCL/NPU), NVIDIA/AMD (Vulkan), and CPU support.
 
 ## Installation
 
