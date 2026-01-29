@@ -11,6 +11,14 @@ log_err() {
 
 log_info "--- OLLAMA UNIVERSAL ACCELERATION STARTUP ---"
 
+# 0. Initialize Intel oneAPI Environment (if present)
+if [ -f /opt/intel/oneapi/setvars.sh ]; then
+    log_info "Sourcing Intel oneAPI environment variables..."
+    source /opt/intel/oneapi/setvars.sh
+else
+    log_info "Intel oneAPI setvars.sh not found. Skipping."
+fi
+
 # 1. Hardware Enumeration & Requirement Check
 if [ -f /etc/os-release ]; then
     UBUNTU_VER=$(grep "VERSION_ID" /etc/os-release | cut -d= -f2 | xargs)
