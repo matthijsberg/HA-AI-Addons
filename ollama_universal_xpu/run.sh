@@ -94,7 +94,7 @@ log_info "Configuring for ${ACCEL_CHOICE} (Index: ${GPU_IDX})..."
 case $ACCEL_CHOICE in
   "gpu")
     # Intel-specific SYCL/oneAPI Path
-    # export ONEAPI_DEVICE_SELECTOR="level_zero:${GPU_IDX}"
+    export ONEAPI_DEVICE_SELECTOR="level_zero:${GPU_IDX}"
     export OLLAMA_NUM_GPU=999
     ;;
   "npu")
