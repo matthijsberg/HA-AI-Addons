@@ -30,8 +30,8 @@ options:
   models: 
     - "llama3.2:3b"
   keep_alive: "5m"
+watchdog: tcp://[HOST]:11434
 schema:
-  models: 
+  models:
     - str
   keep_alive: str
-  watchdog: tcp://[HOST]:[PORT:11434]
