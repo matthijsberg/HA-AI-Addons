@@ -21,8 +21,8 @@ RUN apt-get update && apt-get install -y \
 RUN apt-get install -y \
     intel-opencl-icd \
     level-zero \
-    level-zero-gpu \
-    intel-level-zero-npu \
+    intel-level-zero-gpu \
+    intel-driver-compiler-npu \
     libigc1 \
     intel-igc-cm \
     libze1 \
