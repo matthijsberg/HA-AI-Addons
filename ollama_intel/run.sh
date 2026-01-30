@@ -12,18 +12,22 @@ KEEP_ALIVE=$(bashio::config 'keep_alive')
 export OLLAMA_KEEP_ALIVE="$KEEP_ALIVE"
 
 # --- 1. Hardware Check ---
-if clinfo -l | grep -i "Intel" | grep -q "GPU"; then
-    GPU_NAME=$(clinfo | grep "Device Name" | head -n 1 | awk -F: '{print $2}' | xargs)
-    bashio::log.info "Intel GPU detected: $GPU_NAME"
+if [ -d "/dev/dri" ]; then
+    bashio::log.info "Intel GPU device files detected."
     
     # Force driver visibility
     export ZES_ENABLE_SYSMAN=1
     export OLLAMA_INTEL_GPU=1
-    
-    # Arrow Lake optimization
     export SYCL_CACHE_PERSISTENT=1
+
+    if clinfo -l | grep -i "Intel" | grep -q "GPU"; then
+        GPU_NAME=$(clinfo | grep "Device Name" | head -n 1 | awk -F: '{print $2}' | xargs)
+        bashio::log.info "OpenCL detected Intel GPU: $GPU_NAME"
+    else
+        bashio::log.warning "OpenCL did not detect Intel GPU, but /dev/dri exists. Proceeding with Level Zero."
+    fi
 else
-    bashio::log.warning "ATTENTION: No Intel GPU detected. Falling back to CPU (slow)."
+    bashio::log.warning "ATTENTION: No Intel GPU detected (/dev/dri missing). Falling back to CPU (slow)."
 fi
 
 # --- 2. Start Ollama (Background) ---
