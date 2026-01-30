@@ -22,7 +22,6 @@ RUN apt-get install -y \
     intel-opencl-icd \
     level-zero \
     intel-level-zero-gpu \
-    intel-driver-compiler-npu \
     libigc1 \
     intel-igc-cm \
     libze1 \
