@@ -59,25 +59,22 @@ def update_config_string(models):
     
     # Use regex to replace the model list in schema
     # Target:
-    #   models: 
-    #     - str
+    #   model: str
     # OR
-    #   models:
-    #     - list(...)
+    #   model: list(...)
     
-    new_schema_line = f'    - list({models_string})'
+    new_schema_line = f'list({models_string})'
     
-    # Regex to match "- str" or "- list(...)" inside "models:" block
-    # We assume indentation is 4 spaces for the list item
-    pattern = r'(\s+models:\s*\n\s+)- (str|list\([^)]*\))'
+    # Regex to match "model: str" or "model: list(...)"
+    pattern = r'(\s+model:\s*)(str|list\([^)]*\))'
     
     if re.search(pattern, content):
-        new_content = re.sub(pattern, f'\\1{new_schema_line.strip()}', content)
+        new_content = re.sub(pattern, f'\\1{new_schema_line}', content)
         with open(CONFIG_PATH, 'w') as f:
             f.write(new_content)
         print(f"Updated {CONFIG_PATH} with {len(model_options)} model options.")
     else:
-        print("Could not find the 'models' list pattern in config.yaml.")
+        print("Could not find the 'model' pattern in config.yaml.")
 
 if __name__ == "__main__":
     popular_models = fetch_popular_models()

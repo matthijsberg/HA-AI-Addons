@@ -43,17 +43,16 @@ done
 bashio::log.info "Ollama is online!"
 
 # --- 3. Model Management ---
-for model in $(bashio::config 'models'); do
-    bashio::log.info "Checking model: $model"
-    
-    if ollama list | grep -q "$model"; then
-        bashio::log.info "Model '$model' already present."
-    else
-        bashio::log.info "Downloading '$model'. This may take a while..."
-        ollama pull "$model"
-        bashio::log.info "Download of '$model' complete."
-    fi
-done
+MODEL=$(bashio::config 'model')
+bashio::log.info "Checking model: $MODEL"
+
+if ollama list | grep -q "$MODEL"; then
+    bashio::log.info "Model '$MODEL' already present."
+else
+    bashio::log.info "Downloading '$MODEL'. This may take a while..."
+    ollama pull "$MODEL"
+    bashio::log.info "Download of '$MODEL' complete."
+fi
 
 # --- 4. Keep Running ---
 bashio::log.info "Ready to serve. Keep-alive set to: $KEEP_ALIVE"
