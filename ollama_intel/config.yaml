@@ -1,5 +1,5 @@
 name: "Ollama (Intel AI Core)"
-version: "0.5.7-2"
+version: "0.5.7-4"
 slug: "ollama_intel"
 description: "Ollama with Intel Arc GPU support for Arrow Lake. Optimized for Intel hardware."
 url: "https://github.com/matthijsberg/HA-AI-Addons"
@@ -14,10 +14,15 @@ privileged:
 full_access: true
 devices:
   - /dev/dri:/dev/dri
+  - /dev/video0:/dev/video0
 ports:
   11434/tcp: 11434
+ports_description:
+  11434/tcp: "The Ollama API Port, not used for End-User Access"
 ingress: true
 ingress_port: 11434
+ingress_stream: true
+video: true
 map:
   - config:rw
   - share:rw
@@ -29,3 +34,4 @@ schema:
   models: 
     - str
   keep_alive: str
+  watchdog: tcp://[HOST]:[PORT:11434]

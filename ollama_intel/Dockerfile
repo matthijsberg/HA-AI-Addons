@@ -22,10 +22,7 @@ RUN apt-get install -y \
     intel-opencl-icd \
     level-zero \
     intel-level-zero-gpu \
-    libigc1 \
-    intel-igc-cm \
     libze1 \
-    libtbb12 \
     && rm -rf /var/lib/apt/lists/*
 
 # 3. Install Bashio
