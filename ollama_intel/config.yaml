@@ -1,5 +1,5 @@
 name: "Ollama (Intel AI Core)"
-version: "0.5.7-12"
+version: "0.5.7-13"
 slug: "ollama_intel"
 description: "Ollama with Intel Arc GPU support for Arrow Lake. Optimized for Intel hardware."
 url: "https://github.com/matthijsberg/HA-AI-Addons"
@@ -31,6 +31,8 @@ options:
   keep_alive: "5m"
   num_parallel: 1
   max_loaded_models: 1
+  num_ctx: 2048
+  gpu_overhead: 0
   debug: false
 watchdog: tcp://[HOST]:11434
 schema:
@@ -38,4 +40,6 @@ schema:
   keep_alive: str
   num_parallel: int
   max_loaded_models: int
+  num_ctx: int
+  gpu_overhead: int
   debug: bool

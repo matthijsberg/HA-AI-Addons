@@ -11,11 +11,15 @@ export OLLAMA_MODELS="/share/ollama_models"
 KEEP_ALIVE=$(bashio::config 'keep_alive')
 NUM_PARALLEL=$(bashio::config 'num_parallel')
 MAX_LOADED_MODELS=$(bashio::config 'max_loaded_models')
+NUM_CTX=$(bashio::config 'num_ctx')
+GPU_OVERHEAD=$(bashio::config 'gpu_overhead')
 DEBUG=$(bashio::config 'debug')
 
 export OLLAMA_KEEP_ALIVE="$KEEP_ALIVE"
 export OLLAMA_NUM_PARALLEL="$NUM_PARALLEL"
 export OLLAMA_MAX_LOADED_MODELS="$MAX_LOADED_MODELS"
+export OLLAMA_NUM_CTX="$NUM_CTX"
+export OLLAMA_GPU_OVERHEAD="$GPU_OVERHEAD"
 export OLLAMA_DEBUG="$DEBUG"
 
 # --- 1. Hardware Check ---

@@ -24,6 +24,15 @@ The maximum number of models to keep loaded in memory at the same time.
 - Default: `1`
 - Increase this if you have enough VRAM and want to switch between models quickly without reloading.
 
+### Option: `num_ctx`
+The default context window size (in tokens).
+- Default: `2048`
+- Increasing this allows for longer conversations but uses significantly more VRAM.
+
+### Option: `gpu_overhead`
+Reserve a portion of VRAM (in bytes) for other applications or system overhead.
+- Default: `0`
+
 ### Option: `debug`
 Enable debug logging for Ollama.
 - Default: `false`
