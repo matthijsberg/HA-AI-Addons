@@ -1,0 +1,31 @@
+name: "Ollama (Intel AI Core)"
+version: "0.5.7"
+slug: "ollama_intel"
+description: "Ollama with Intel Arc GPU support for Arrow Lake. Optimized for Intel hardware."
+url: "https://github.com/matthijsberg/HA-AI-Addons"
+startup: application
+boot: auto
+arch:
+  - amd64
+privileged:
+  - SYS_ADMIN
+  - SYS_RAWIO
+  - SYS_PTRACE
+full_access: true
+devices:
+  - /dev/dri:/dev/dri
+ports:
+  11434/tcp: 11434
+ingress: true
+ingress_port: 11434
+map:
+  - config:rw
+  - share:rw
+options:
+  models: 
+    - "llama3.2:3b"
+  keep_alive: "5m"
+schema:
+  models: 
+    - str
+  keep_alive: str

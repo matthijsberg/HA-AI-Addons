@@ -43,8 +43,14 @@ if [ -f /opt/intel/oneapi/setvars.sh ]; then
         ln -sf "$MKL_PATH"/libmkl_sequential.so /usr/lib/libmkl_sequential.so
         ln -sf "$MKL_PATH"/libmkl_core.so /usr/lib/libmkl_core.so
     fi
-else
-    log_info "Intel oneAPI setvars.sh not found. Skipping."
+fi
+
+# Create symlinks for Level Zero libraries
+if [ -d /usr/lib/x86_64-linux-gnu ]; then
+    log_info "Creating symlinks for Level Zero libraries in /usr/lib..."
+    ln -sf /usr/lib/x86_64-linux-gnu/libze_loader.so.1 /usr/lib/libze_loader.so.1
+    ln -sf /usr/lib/x86_64-linux-gnu/libze_loader.so.1 /usr/lib/libze_loader.so
+    ln -sf /usr/lib/x86_64-linux-gnu/libze_intel_gpu.so.1 /usr/lib/libze_intel_gpu.so.1
 fi
 
 # 1. Hardware Enumeration & Requirement Check
@@ -56,44 +62,31 @@ fi
 KERNEL_VER=$(uname -r)
 log_info "Host Environment -> OS: Ubuntu ${UBUNTU_VER}, Kernel: ${KERNEL_VER}"
 
-# Debug: Hardware Diagnostics
+# Debug: Check device nodes
 log_info "--- Debug: /dev/dri Listing ---"
-ls -l /dev/dri 2>/dev/null || log_err "No /dev/dri found"
-
+ls -l /dev/dri
 log_info "--- Debug: clinfo Output ---"
-if command -v clinfo &> /dev/null; then
-    clinfo
-else
-    log_err "clinfo command not found"
-fi
+clinfo
 log_info "--- Debug: Library Locations ---"
-ls -l /usr/lib/x86_64-linux-gnu/libze* 2>/dev/null || log_info "No libze found in /usr/lib/x86_64-linux-gnu/"
-ls -l /usr/lib/libze* 2>/dev/null || log_info "No libze found in /usr/lib/"
+ls -l /usr/lib/x86_64-linux-gnu/libze* 2>/dev/null
+ls -l /usr/lib/libze* 2>/dev/null
+log_info "No libze found in /usr/lib/" # Fallback message if ls fails
 log_info "Searching for libsycl.so..."
-find / -name "libsycl.so*" 2>/dev/null || log_info "libsycl.so not found via find"
+find / -name libsycl.so* 2>/dev/null
 log_info "Searching for setvars.sh..."
-find / -name "setvars.sh" 2>/dev/null || log_info "setvars.sh not found via find"
+find / -name setvars.sh 2>/dev/null
 log_info "--- End Debug ---"
 
 # 2. Dynamic Backend Configuration
 CONFIG_PATH="/data/options.json"
-
-if [ -f "$CONFIG_PATH" ]; then
-    ACCEL_CHOICE=$(jq -r '.accelerator // "cpu"' "$CONFIG_PATH")
-    GPU_IDX=$(jq -r '.gpu_index // 0' "$CONFIG_PATH")
-    KEEP_ALIVE=$(jq -r '.keep_alive // "5m"' "$CONFIG_PATH")
-else
-    log_info "Config file not found at $CONFIG_PATH, using defaults."
-    ACCEL_CHOICE="cpu"
-    GPU_IDX=0
-    KEEP_ALIVE="5m"
-fi
-
+ACCEL_CHOICE=$(jq -r '.accelerator' $CONFIG_PATH)
+GPU_IDX=$(jq -r '.gpu_index' $CONFIG_PATH)
 log_info "Configuring for ${ACCEL_CHOICE} (Index: ${GPU_IDX})..."
 
 case $ACCEL_CHOICE in
   "gpu")
     # Intel-specific SYCL/oneAPI Path
+    # Force Level Zero backend for Intel GPU
     export ONEAPI_DEVICE_SELECTOR="level_zero:${GPU_IDX}"
     export OLLAMA_NUM_GPU=999
     ;;
@@ -120,7 +113,7 @@ esac
 # 3. Global Runtime Tuning
 export ZES_ENABLE_SYSMAN=1
 export SYCL_CACHE_PERSISTENT=1
-export OLLAMA_KEEP_ALIVE="$KEEP_ALIVE"
+export OLLAMA_KEEP_ALIVE=$(jq -r '.keep_alive' $CONFIG_PATH)
 
 log_info "Launching Ollama Server..."
 exec /usr/bin/ollama serve
