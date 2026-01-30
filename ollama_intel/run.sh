@@ -9,7 +9,14 @@ export OLLAMA_MODELS="/share/ollama_models"
 
 # Load Config
 KEEP_ALIVE=$(bashio::config 'keep_alive')
+NUM_PARALLEL=$(bashio::config 'num_parallel')
+MAX_LOADED_MODELS=$(bashio::config 'max_loaded_models')
+DEBUG=$(bashio::config 'debug')
+
 export OLLAMA_KEEP_ALIVE="$KEEP_ALIVE"
+export OLLAMA_NUM_PARALLEL="$NUM_PARALLEL"
+export OLLAMA_MAX_LOADED_MODELS="$MAX_LOADED_MODELS"
+export OLLAMA_DEBUG="$DEBUG"
 
 # --- 1. Hardware Check ---
 if [ -d "/dev/dri" ]; then
@@ -56,4 +63,10 @@ fi
 
 # --- 4. Keep Running ---
 bashio::log.info "Ready to serve. Keep-alive set to: $KEEP_ALIVE"
-wait "$PID"
+
+# --- 5. Start Web UI ---
+bashio::log.info "Starting Web UI..."
+python3 -u /web_server.py 2>&1 &
+WEB_PID=$!
+
+wait "$PID" "$WEB_PID"
