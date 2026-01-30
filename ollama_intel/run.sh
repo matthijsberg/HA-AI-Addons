@@ -6,6 +6,7 @@ bashio::log.info "Starting Intel Arrow Lake Ollama Add-on..."
 export LD_LIBRARY_PATH="/usr/lib/x86_64-linux-gnu:/usr/lib:${LD_LIBRARY_PATH:-}"
 export OLLAMA_HOST="0.0.0.0:11434"
 export OLLAMA_MODELS="/share/ollama_models"
+export OLLAMA_ORIGINS="*"
 
 # Load Config
 KEEP_ALIVE=$(bashio::config 'keep_alive')
