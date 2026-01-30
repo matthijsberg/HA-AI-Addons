@@ -3,7 +3,7 @@
 bashio::log.info "Starting Intel Arrow Lake Ollama Add-on..."
 
 # --- 0. Environment Setup ---
-export LD_LIBRARY_PATH="/usr/lib/x86_64-linux-gnu:/usr/lib:${LD_LIBRARY_PATH}"
+export LD_LIBRARY_PATH="/usr/lib/x86_64-linux-gnu:/usr/lib:${LD_LIBRARY_PATH:-}"
 export OLLAMA_HOST="0.0.0.0:11434"
 export OLLAMA_MODELS="/share/ollama_models"
 
