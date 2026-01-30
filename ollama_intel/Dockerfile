@@ -12,7 +12,7 @@ LABEL \
 
 # 1. Base tools & Intel Repos
 RUN apt-get update && apt-get install -y \
-    curl wget gnupg2 pciutils clinfo jq \
+    curl wget gnupg2 pciutils clinfo jq python3 \
     && wget -qO - https://repositories.intel.com/gpu/intel-graphics.key | gpg --dearmor --output /usr/share/keyrings/intel-graphics.gpg \
     && echo "deb [arch=amd64 signed-by=/usr/share/keyrings/intel-graphics.gpg] https://repositories.intel.com/gpu/ubuntu noble client" > /etc/apt/sources.list.d/intel-gpu.list \
     && apt-get update
@@ -46,6 +46,7 @@ ENV OLLAMA_INTEL_GPU=1
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
     CMD curl -f http://localhost:11434/ || exit 1
 
+COPY fetch_models.py /usr/bin/fetch_models.py
 COPY run.sh /run.sh
 RUN chmod a+x /run.sh
 
