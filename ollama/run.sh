@@ -165,7 +165,12 @@ mkdir -p "$OLLAMA_MODELS"
 # Start Ollama in background
 echo "Starting Ollama Server..."
 # Use the local ollama binary created by init-ollama
-./ollama serve &
+if [ "$DEBUG" = "True" ]; then
+    ./ollama serve &
+else
+    # Filter out GIN access logs in non-debug mode
+    ./ollama serve 2>&1 | grep -v "\[GIN\]" &
+fi
 PID=$!
 
 # Wait for Ollama to start
