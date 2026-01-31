@@ -53,7 +53,8 @@
                         runningModelSpan.innerHTML = `<strong>Active Model (VRAM):</strong> ${running}`;
                         runningModelSpan.style.color = '#28a745';
                     } else {
-                        runningModelSpan.textContent = 'Active Model (VRAM): Idle (Ready to chat)';
+                        const selected = modelSelect.value || "None";
+                        runningModelSpan.textContent = `Active Model (VRAM): Idle (Will load '${selected}')`;
                         runningModelSpan.style.color = '#666';
                     }
                 }
