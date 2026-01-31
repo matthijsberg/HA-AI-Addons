@@ -34,6 +34,13 @@ else
     UPDATE_OLLAMA="False"
 fi
 
+# Normalize DEBUG to 1/0 for Ollama
+if [ "$DEBUG" = "True" ]; then
+    export OLLAMA_DEBUG="1"
+else
+    export OLLAMA_DEBUG="0"
+fi
+
 # Smart fallback: If NPU is selected/defaulted but no hardware found, switch to CPU
 if [ "$DEVICE_TYPE" = "NPU" ] && [ ! -e "/dev/accel" ]; then
     echo "Warning: NPU selected but /dev/accel not found. Falling back to CPU."
@@ -55,13 +62,19 @@ else
 fi
 
 # IPEX and Ollama Initialization
-echo "--- IPEX Initialization ---"
+if [ "$DEBUG" = "True" ]; then
+    echo "--- IPEX Initialization ---"
+fi
+
 if [ "$DEVICE_TYPE" = "CPU" ]; then
     echo "Running in CPU mode. Skipping IPEX GPU init."
 else
     # Source the IPEX environment (this sets up SYCL and oneAPI paths)
-    # Note: we use . because source might not be available in some shells
-    . ipex-llm-init --gpu --device "$DEVICE" || echo "IPEX-LLM init failed, continuing anyway..."
+    if [ "$DEBUG" = "True" ]; then
+        . ipex-llm-init --gpu --device "$DEVICE" || echo "IPEX-LLM init failed, continuing anyway..."
+    else
+        . ipex-llm-init --gpu --device "$DEVICE" > /dev/null 2>&1 || echo "IPEX-LLM init failed, continuing anyway..."
+    fi
 
     # Verify if SYCL actually sees a Level Zero device (Intel GPU)
     # If not, fallback to CPU to avoid crash
@@ -99,16 +112,18 @@ if [ "$UPDATE_OLLAMA" = "True" ]; then
 fi
 
 # Hardware Diagnostics
-echo "--- Hardware Diagnostics ---"
-echo "Checking /dev/dri:"
-ls -l /dev/dri 2>/dev/null || echo "No /dev/dri found"
-echo "Checking /dev/accel:"
-ls -l /dev/accel 2>/dev/null || echo "No /dev/accel found"
-echo "SYCL Devices (sycl-ls):"
-sycl-ls 2>/dev/null || echo "sycl-ls not found or failed"
-echo "Environment for Ollama:"
-env | grep -E "OLLAMA|DEVICE|ZES|ONEAPI" || true
-echo "---------------------------"
+if [ "$DEBUG" = "True" ]; then
+    echo "--- Hardware Diagnostics ---"
+    echo "Checking /dev/dri:"
+    ls -l /dev/dri 2>/dev/null || echo "No /dev/dri found"
+    echo "Checking /dev/accel:"
+    ls -l /dev/accel 2>/dev/null || echo "No /dev/accel found"
+    echo "SYCL Devices (sycl-ls):"
+    sycl-ls 2>/dev/null || echo "sycl-ls not found or failed"
+    echo "Environment for Ollama:"
+    env | grep -E "OLLAMA|DEVICE|ZES|ONEAPI" || true
+    echo "---------------------------"
+fi
 
 # Configure Ollama environment
 export OLLAMA_HOST="0.0.0.0"
@@ -118,7 +133,7 @@ export OLLAMA_KEEP_ALIVE="$KEEP_ALIVE"
 export OLLAMA_NUM_PARALLEL="$NUM_PARALLEL"
 export OLLAMA_MAX_LOADED_MODELS="$MAX_LOADED_MODELS"
 export OLLAMA_NUM_CTX="$NUM_CTX"
-export OLLAMA_DEBUG="$DEBUG"
+# OLLAMA_DEBUG is already exported above
 
 echo "Ollama Configuration:"
 echo "  Keep-Alive: $OLLAMA_KEEP_ALIVE"
