@@ -23,6 +23,25 @@ Controls how long the model stays loaded in memory (RAM/VRAM) after the last req
 - Set to `-1` to keep the model loaded indefinitely (improves performance for frequent requests but uses more RAM).
 - Examples: `10m`, `1h`, `24h`.
 
+### Option: `num_parallel`
+The maximum number of parallel requests to handle.
+- Default: `1`
+- Increase this if you want to handle multiple requests simultaneously (requires more VRAM).
+
+### Option: `max_loaded_models`
+The maximum number of models to keep loaded in memory at the same time.
+- Default: `1`
+- Increase this if you have enough VRAM and want to switch between models quickly without reloading.
+
+### Option: `num_ctx`
+The default context window size (in tokens).
+- Default: `2048`
+- Increasing this allows for longer conversations but uses significantly more VRAM.
+
+### Option: `debug`
+Enable debug logging for Ollama.
+- Default: `false`
+
 ## Web UI
 
 The add-on includes a built-in Chat UI.

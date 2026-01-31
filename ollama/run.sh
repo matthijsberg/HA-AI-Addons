@@ -17,12 +17,20 @@ if [ -f /data/options.json ]; then
     CUSTOM_MODEL=$(python3 -c "import sys, json; print(json.load(open('/data/options.json')).get('custom_model', '') or '')")
     DEVICE_TYPE=$(python3 -c "import sys, json; print(json.load(open('/data/options.json')).get('device_type', 'NPU') or 'NPU')")
     KEEP_ALIVE=$(python3 -c "import sys, json; print(json.load(open('/data/options.json')).get('keep_alive', '5m') or '5m')")
+    NUM_PARALLEL=$(python3 -c "import sys, json; print(json.load(open('/data/options.json')).get('num_parallel', 1))")
+    MAX_LOADED_MODELS=$(python3 -c "import sys, json; print(json.load(open('/data/options.json')).get('max_loaded_models', 1))")
+    NUM_CTX=$(python3 -c "import sys, json; print(json.load(open('/data/options.json')).get('num_ctx', 2048))")
+    DEBUG=$(python3 -c "import sys, json; print(json.load(open('/data/options.json')).get('debug', False))")
     UPDATE_OLLAMA=$(python3 -c "import sys, json; print(json.load(open('/data/options.json')).get('update_ollama', False))")
 else
-    MODEL=${MODEL:-"llama3:8b"}
+    MODEL=${MODEL:-"gemma2:2b"}
     CUSTOM_MODEL=${CUSTOM_MODEL:-""}
     DEVICE_TYPE=${DEVICE_TYPE:-"NPU"}
     KEEP_ALIVE=${KEEP_ALIVE:-"5m"}
+    NUM_PARALLEL=${NUM_PARALLEL:-1}
+    MAX_LOADED_MODELS=${MAX_LOADED_MODELS:-1}
+    NUM_CTX=${NUM_CTX:-2048}
+    DEBUG=${DEBUG:-"False"}
     UPDATE_OLLAMA="False"
 fi
 
@@ -107,8 +115,17 @@ export OLLAMA_HOST="0.0.0.0"
 export OLLAMA_MODELS="/share/ollama/models"
 export OLLAMA_ORIGINS="*"
 export OLLAMA_KEEP_ALIVE="$KEEP_ALIVE"
+export OLLAMA_NUM_PARALLEL="$NUM_PARALLEL"
+export OLLAMA_MAX_LOADED_MODELS="$MAX_LOADED_MODELS"
+export OLLAMA_NUM_CTX="$NUM_CTX"
+export OLLAMA_DEBUG="$DEBUG"
 
-echo "Ollama Keep-Alive: $OLLAMA_KEEP_ALIVE"
+echo "Ollama Configuration:"
+echo "  Keep-Alive: $OLLAMA_KEEP_ALIVE"
+echo "  Num Parallel: $OLLAMA_NUM_PARALLEL"
+echo "  Max Loaded Models: $OLLAMA_MAX_LOADED_MODELS"
+echo "  Num Context: $OLLAMA_NUM_CTX"
+echo "  Debug: $OLLAMA_DEBUG"
 
 if [ "$DEVICE_TYPE" != "CPU" ]; then
     echo "Configuring environment for Intel $DEVICE_TYPE..."

@@ -60,7 +60,7 @@ if __name__ == "__main__":
     # Serve files from the directory where this script is located
     os.chdir(os.path.dirname(os.path.abspath(__file__)))
     # Allow reuse address to avoid "Address already in use" on restart
-    socketserver.TCPServer.allow_reuse_address = True
-    with socketserver.TCPServer(("", PORT), ProxyHandler) as httpd:
+    socketserver.ThreadingTCPServer.allow_reuse_address = True
+    with socketserver.ThreadingTCPServer(("", PORT), ProxyHandler) as httpd:
         print(f"Serving UI on port {PORT}")
         httpd.serve_forever()

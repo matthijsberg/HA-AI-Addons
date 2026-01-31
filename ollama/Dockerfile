@@ -26,4 +26,8 @@ COPY index.html /
 
 RUN chmod a+x /run.sh
 
+# Healthcheck
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
+    CMD curl -f http://localhost:11434/ || exit 1
+
 CMD [ "/run.sh" ]
