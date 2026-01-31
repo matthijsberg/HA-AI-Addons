@@ -50,10 +50,10 @@
                     const data = await response.json();
                     if (data.models && data.models.length > 0) {
                         const running = data.models.map(m => m.name).join(', ');
-                        runningModelSpan.innerHTML = `<strong>Loaded Model:</strong> ${running}`;
+                        runningModelSpan.innerHTML = `<strong>Active Model (VRAM):</strong> ${running}`;
                         runningModelSpan.style.color = '#28a745';
                     } else {
-                        runningModelSpan.textContent = 'Loaded Model: None (Idle)';
+                        runningModelSpan.textContent = 'Active Model (VRAM): Idle (Ready to chat)';
                         runningModelSpan.style.color = '#666';
                     }
                 }
