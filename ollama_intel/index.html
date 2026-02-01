@@ -50,10 +50,11 @@
                     const data = await response.json();
                     if (data.models && data.models.length > 0) {
                         const running = data.models.map(m => m.name).join(', ');
-                        runningModelSpan.innerHTML = `<strong>Loaded Model:</strong> ${running}`;
+                        runningModelSpan.innerHTML = `<strong>Active Model (VRAM):</strong> ${running}`;
                         runningModelSpan.style.color = '#28a745';
                     } else {
-                        runningModelSpan.textContent = 'Loaded Model: None (Idle)';
+                        const selected = modelSelect.value || "None";
+                        runningModelSpan.textContent = `Active Model (VRAM): Idle (Will load '${selected}')`;
                         runningModelSpan.style.color = '#666';
                     }
                 }
@@ -256,5 +257,6 @@
         // Refresh models every 5s to keep status updated
         setInterval(fetchModels, 5000);
     </script>
+    <div style="font-size: 0.8em; color: #aaa; text-align: center; margin-top: 20px;">v0.5.7-17</div>
 </body>
 </html>

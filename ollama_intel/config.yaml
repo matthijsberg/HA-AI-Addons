@@ -1,5 +1,5 @@
 name: "Ollama (Intel AI Core)"
-version: "0.5.7-16"
+version: "0.5.7-17"
 slug: "ollama_intel"
 description: "Ollama with Intel Arc GPU support for Arrow Lake. Optimized for Intel hardware."
 url: "https://github.com/matthijsberg/HA-AI-Addons"

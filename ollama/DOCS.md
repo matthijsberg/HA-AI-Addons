@@ -59,6 +59,8 @@ This add-on is built on top of Intel IPEX-LLM and supports:
 
 **Base Image:** `intelanalytics/ipex-llm-inference-cpp-xpu:latest`
 
+> **Note:** The Intel IPEX-LLM base image used by this add-on is no longer actively maintained by Intel. This may result in outdated Ollama versions and lack of support for newer model architectures (e.g., GLM-4). For the latest updates and broader model support, consider using the `ollama_intel` add-on which builds from a fresh Ubuntu base.
+
 This add-on uses the Intel IPEX-LLM container for hardware acceleration on Intel GPUs.
 - **Docker Hub:** [intelanalytics/ipex-llm-inference-cpp-xpu](https://hub.docker.com/r/intelanalytics/ipex-llm-inference-cpp-xpu)
 - **Documentation:** [IPEX-LLM Documentation](https://github.com/intel-analytics/ipex-llm)

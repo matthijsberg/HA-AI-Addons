@@ -29,6 +29,12 @@ class ProxyHandler(http.server.SimpleHTTPRequestHandler):
         else:
             self.send_error(404)
 
+    def end_headers(self):
+        self.send_header('Cache-Control', 'no-cache, no-store, must-revalidate')
+        self.send_header('Pragma', 'no-cache')
+        self.send_header('Expires', '0')
+        super().end_headers()
+
     def proxy_request(self, method):
         url = f"{OLLAMA_URL}{self.path}"
         try:
